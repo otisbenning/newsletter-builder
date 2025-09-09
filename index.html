@@ -1,0 +1,1869 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start with a Friend Newsletter Builder</title>
+    
+    <!-- Cropper.js CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    
+    <style>
+        /* Reset und Basis-Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            --primary-color: #009a93;
+            --secondary-color: #00989a;
+            --accent-color: #c5003d;
+            --dark-color: #213293;
+            font-family: 'GT Walsheim', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: #f5f5f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* App Container */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: white;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .app-logo {
+            height: 36px;
+            margin-right: 10px;
+            filter: brightness(0) invert(1);
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .header-buttons button {
+            padding: 8px 16px;
+            background-color: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .header-buttons button:hover {
+            background-color: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .header-button-separator {
+            width: 1px;
+            height: 24px;
+            background-color: rgba(255,255,255,0.3);
+            margin: 0 8px;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #e0e0e0;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .module {
+            background-color: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: move;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .module:hover {
+            border-color: var(--primary-color);
+            transform: translateX(5px);
+            box-shadow: 0 2px 8px rgba(0,153,147,0.2);
+        }
+
+        .module-drag-handle {
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+        }
+
+        .module-drag-handle::after {
+            content: "≡";
+        }
+
+        .module-title {
+            margin-left: 20px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Template Editor */
+        .template-editor {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .template-header {
+            background-color: white;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        #templateTitle {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* Preview Area */
+        .preview-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(to bottom, #f9f9f9, #ffffff);
+        }
+
+        .preview-content {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            min-height: 100%;
+        }
+
+        /* Template Module */
+        .template-module {
+            position: relative;
+            margin: 16px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            transition: all 0.2s;
+        }
+
+        .template-module:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--primary-color);
+        }
+
+        .module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            border-radius: 6px 6px 0 0;
+            cursor: move;
+        }
+
+        .module-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .module-actions button {
+            padding: 4px 8px;
+            font-size: 12px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .module-actions button:hover {
+            background-color: #f0f0f0;
+        }
+
+        .edit-module {
+            color: #0066cc;
+        }
+
+        .duplicate-module {
+            color: #28a745;
+        }
+
+        .delete-module {
+            color: #dc3545;
+        }
+
+        .module-content {
+            padding: 16px;
+        }
+
+        /* Editor Actions */
+        .editor-actions {
+            padding: 12px 16px;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            background-color: white;
+        }
+
+        /* Buttons */
+        .primary-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .primary-btn:hover {
+            background-color: #007a73;
+            transform: translateY(-2px);
+        }
+
+        .secondary-btn {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            border-radius: 6px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .secondary-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 1001;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            padding: 24px;
+            min-width: 500px;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal h2 {
+            color: var(--primary-color);
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Field Groups */
+        .field-group {
+            margin-bottom: 20px;
+        }
+
+        .field-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .field-group input,
+        .field-group textarea,
+        .field-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .field-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        /* Tabs */
+        .module-editor-tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+
+        .module-editor-tab {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: #666;
+            transition: all 0.2s;
+        }
+
+        .module-editor-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        /* Dynamic Items List */
+        .dynamic-items-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .event-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .event-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 10px;
+        }
+
+        .event-date-box {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+            min-width: 50px;
+        }
+
+        .event-date-month {
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        .event-date-day {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .event-badges {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            color: white;
+        }
+
+        .badge-category {
+            background: var(--secondary-color);
+        }
+
+        .badge-mode {
+            background: var(--accent-color);
+        }
+
+        .badge-location {
+            background: var(--dark-color);
+        }
+
+        /* Image Upload */
+        .image-upload-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        .image-upload-btn:hover {
+            background-color: #007a73;
+        }
+
+        .image-preview {
+            margin-top: 10px;
+            max-width: 200px;
+            max-height: 100px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100px;
+            display: block;
+        }
+
+        /* Overlay */
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 16px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+
+        .notification.error {
+            background-color: var(--accent-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Drag & Drop */
+        .dragging {
+            opacity: 0.5;
+        }
+
+        .drag-over {
+            border: 2px dashed var(--primary-color);
+            background-color: rgba(0, 153, 147, 0.05);
+        }
+
+        /* Event Scraper Specific */
+        .scraper-container {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .scraper-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header-buttons {
+                flex-wrap: wrap;
+                gap: 5px;
+            }
+            
+            .modal-content {
+                min-width: auto;
+                width: 95vw;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>
+                <img src="https://www.start-with-a-friend.de/wp-content/uploads/2023/05/start-with-a-friend-mobile-logo-1-ai-1.svg" 
+                     alt="Start with a Friend" class="app-logo">
+                Newsletter Builder
+            </h1>
+            <div class="header-buttons">
+                <button id="newTemplateBtn" title="Neues Template">Neu</button>
+                <button id="saveTemplateBtn" title="Template speichern">Speichern</button>
+                <button id="loadTemplateBtn" title="Template laden">Laden</button>
+                <div class="header-button-separator"></div>
+                <button id="exportTemplateBtn" title="Als JSON exportieren">Export JSON</button>
+                <button id="importTemplateBtn" title="JSON importieren">Import JSON</button>
+                <div class="header-button-separator"></div>
+                <button id="previewBtn" title="Vorschau">Vorschau</button>
+                <button id="exportHTMLBtn" title="HTML für Cleverreach exportieren">HTML Export</button>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <aside class="sidebar">
+                <h3>Module</h3>
+                <div class="modules-list">
+                    <div class="module" draggable="true" data-module-type="preheader">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Preheader</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="header">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Header (Logo)</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="image-text">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Bild & Text</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="events">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Events</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="two-columns">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Zwei Spalten</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="cta-section">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Call-to-Action</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="contact-person">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Ansprechpartner</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="partner-news">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Partner News</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="footer-imprint">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Footer/Impressum</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="unsubscribe">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Abmelde-Link</span>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="template-editor">
+                <div class="template-header">
+                    <label for="templateTitle">Template Name:</label>
+                    <input type="text" id="templateTitle" placeholder="Newsletter Template Name">
+                </div>
+                <div class="preview-area">
+                    <div class="preview-content" id="previewContent">
+                        <!-- Template modules will be added here -->
+                        <div style="padding: 40px; text-align: center; color: #999;">
+                            <p>Ziehen Sie Module aus der Seitenleiste hierher, um Ihr Template zu erstellen.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="editor-actions">
+                    <button class="secondary-btn" id="clearTemplateBtn">Template leeren</button>
+                    <button class="primary-btn" id="generateHTMLBtn">HTML generieren</button>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Module Editor Modal -->
+    <div id="moduleEditorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="moduleEditorTitle">Modul bearbeiten</h2>
+            </div>
+            <div class="module-editor-tabs">
+                <button class="module-editor-tab active" data-tab="content">Inhalt</button>
+                <button class="module-editor-tab" data-tab="settings">Einstellungen</button>
+            </div>
+            <div id="moduleEditorContent">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+            <div class="modal-actions">
+                <button class="secondary-btn" id="cancelModuleEdit">Abbrechen</button>
+                <button class="primary-btn" id="saveModuleEdit">Speichern</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Scraper Modal -->
+    <div id="eventScraperModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Events importieren</h2>
+            </div>
+            <div class="scraper-container">
+                <p>Importieren Sie aktuelle Events von der Kerberos Compliance Website.</p>
+                <div class="scraper-filters">
+                    <div class="field-group">
+                        <label for="location-filter">Standort</label>
+                        <select id="location-filter">
+                            <option value="all">Alle Standorte</option>
+                            <option value="berlin">Berlin</option>
+                            <option value="hamburg">Hamburg</option>
+                            <option value="muenchen">München</option>
+                            <option value="koeln">Köln</option>
+                            <option value="frankfurt">Frankfurt</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label for="category-filter">Kategorie</label>
+                        <select id="category-filter">
+                            <option value="all">Alle Kategorien</option>
+                            <option value="communityevent">Community Event</option>
+                            <option value="infoabend">Infoabend</option>
+                            <option value="workshop">Workshop</option>
+                            <option value="training">Training</option>
+                        </select>
+                    </div>
+                    <div class="field-group">
+                        <label for="event-mode-filter">Format</label>
+                        <select id="event-mode-filter">
+                            <option value="all">Alle Formate</option>
+                            <option value="online">Online</option>
+                            <option value="offline">Offline</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="secondary-btn" id="cancelEventScraper">Abbrechen</button>
+                <button class="primary-btn" id="runEventScraper">Events importieren</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Preview Modal -->
+    <div id="previewModal" class="modal">
+        <div class="modal-content" style="width: 90vw; max-width: 1200px;">
+            <div class="modal-header">
+                <h2>Template Vorschau</h2>
+            </div>
+            <div style="height: 600px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; background: white;">
+                <iframe id="previewFrame" style="width: 100%; height: 100%; border: none;"></iframe>
+            </div>
+            <div class="modal-actions">
+                <button class="primary-btn" id="closePreview">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay"></div>
+
+    <script>
+        // Module Templates Definition
+        const MODULE_TEMPLATES = {
+            'preheader': {
+                title: 'Preheader',
+                html: `<div id="CR-PRHEADER" style="display:none;font-size:1px;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;">{{preheaderText}}&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;</div>`,
+                fields: [
+                    { name: 'preheaderText', label: 'Preheader Text', type: 'text', default: 'Wir freuen uns dich zu sehen.' }
+                ]
+            },
+            'header': {
+                title: 'Header (Logo & Onlineversion)',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 20px 30px;">
+                                    <table align="left" style="width: 280px;">
+                                        <tbody>
+                                            <tr>
+                                                <td align="left" style="padding-top:20px;padding-bottom:0px;">
+                                                    <a href="{{logoLink}}">
+                                                        <img alt="Start with a Friend" height="36" src="{{logoUrl}}" style="border: 0px; display: block; width: 180px; height: 36px;" width="180">
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <table align="right">
+                                        <tbody>
+                                            <tr>
+                                                <td align="right" style="padding-top:20px;padding-bottom: 0px;">
+                                                    <a href="https://newsletter.start-with-a-friend.de/m/[MAILING_ID]/[HASH]" style="color: #009a93; text-decoration: none;">{{onlineVersionText}}</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'logoUrl', label: 'Logo URL', type: 'text', default: 'https://www.start-with-a-friend.de/wp-content/uploads/2023/05/start-with-a-friend-mobile-logo-1-ai-1.svg' },
+                    { name: 'logoLink', label: 'Logo Link', type: 'text', default: 'https://www.start-with-a-friend.de/' },
+                    { name: 'onlineVersionText', label: 'Online Version Text', type: 'text', default: 'Im Browser ansehen' }
+                ]
+            },
+            'image-text': {
+                title: 'Bild & Text',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 20px 30px;">
+                                    <img src="{{imageUrl}}" alt="{{imageAlt}}" style="width: 100%; max-width: 580px; height: auto;">
+                                    <h2 style="color: #009a93; margin: 20px 0 10px 0;">{{headline}}</h2>
+                                    <p style="color: #333; line-height: 1.6;">{{text}}</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'imageUrl', label: 'Bild URL', type: 'image', default: 'https://via.placeholder.com/580x290' },
+                    { name: 'imageAlt', label: 'Bild Alt-Text', type: 'text', default: 'Bild' },
+                    { name: 'headline', label: 'Überschrift', type: 'text', default: 'Überschrift' },
+                    { name: 'text', label: 'Text', type: 'textarea', default: 'Hier kommt Ihr Text.' }
+                ]
+            },
+            'events': {
+                title: 'Events',
+                html: `<div class="events-container">{{eventsContent}}</div>`,
+                fields: [
+                    { name: 'eventsTitle', label: 'Events Überschrift', type: 'text', default: 'Unsere nächsten Events' },
+                    { name: 'events', label: 'Events', type: 'dynamic-list', default: [] }
+                ]
+            },
+            'two-columns': {
+                title: 'Zwei Spalten',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 20px 30px;">
+                                    <table>
+                                        <tr>
+                                            <td style="width: 48%; vertical-align: top;">
+                                                <h3 style="color: #009a93;">{{leftTitle}}</h3>
+                                                <p>{{leftContent}}</p>
+                                            </td>
+                                            <td style="width: 4%;"></td>
+                                            <td style="width: 48%; vertical-align: top;">
+                                                <h3 style="color: #009a93;">{{rightTitle}}</h3>
+                                                <p>{{rightContent}}</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'leftTitle', label: 'Linke Überschrift', type: 'text', default: 'Überschrift Links' },
+                    { name: 'leftContent', label: 'Linker Inhalt', type: 'textarea', default: 'Inhalt der linken Spalte' },
+                    { name: 'rightTitle', label: 'Rechte Überschrift', type: 'text', default: 'Überschrift Rechts' },
+                    { name: 'rightContent', label: 'Rechter Inhalt', type: 'textarea', default: 'Inhalt der rechten Spalte' }
+                ]
+            },
+            'cta-section': {
+                title: 'Call-to-Action',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 30px; background-color: #f8f9fa; text-align: center;">
+                                    <h2 style="color: #009a93; margin-bottom: 15px;">{{ctaTitle}}</h2>
+                                    <p style="margin-bottom: 20px;">{{ctaText}}</p>
+                                    <a href="{{ctaLink}}" style="display: inline-block; padding: 12px 30px; background-color: #009a93; color: white; text-decoration: none; border-radius: 6px; font-weight: bold;">{{ctaButtonText}}</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'ctaTitle', label: 'Überschrift', type: 'text', default: 'Werde aktiv!' },
+                    { name: 'ctaText', label: 'Text', type: 'textarea', default: 'Melde dich jetzt an und werde Teil unserer Community.' },
+                    { name: 'ctaButtonText', label: 'Button Text', type: 'text', default: 'Jetzt mitmachen' },
+                    { name: 'ctaLink', label: 'Button Link', type: 'text', default: 'https://www.start-with-a-friend.de/mitmachen/' }
+                ]
+            },
+            'contact-person': {
+                title: 'Ansprechpartner',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 20px 30px;">
+                                    <h3 style="color: #009a93;">{{contactTitle}}</h3>
+                                    <table>
+                                        <tr>
+                                            <td style="width: 120px; vertical-align: top;">
+                                                <img src="{{contactImageUrl}}" alt="{{contactImageAlt}}" style="width: 100px; height: 100px; border-radius: 50%;">
+                                            </td>
+                                            <td style="padding-left: 20px; vertical-align: top;">
+                                                <p style="font-weight: bold; margin: 0;">{{contactName}}</p>
+                                                <p style="margin: 5px 0;">{{contactPosition}}</p>
+                                                <p style="margin: 5px 0;">{{contactEmail}}</p>
+                                                <p style="margin: 5px 0;">{{contactPhone}}</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'contactTitle', label: 'Überschrift', type: 'text', default: 'Dein Ansprechpartner' },
+                    { name: 'contactImageUrl', label: 'Bild URL', type: 'image', default: 'https://via.placeholder.com/120x120' },
+                    { name: 'contactImageAlt', label: 'Bild Alt-Text', type: 'text', default: 'Profilbild' },
+                    { name: 'contactName', label: 'Name', type: 'text', default: 'Max Mustermann' },
+                    { name: 'contactPosition', label: 'Position', type: 'text', default: 'Standortleitung Berlin' },
+                    { name: 'contactEmail', label: 'E-Mail', type: 'text', default: 'berlin@start-with-a-friend.de' },
+                    { name: 'contactPhone', label: 'Telefon', type: 'text', default: '+49 30 5557 7855' }
+                ]
+            },
+            'partner-news': {
+                title: 'Partner News',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 20px 30px; background-color: #f8f9fa;">
+                                    <h3 style="color: #009a93;">{{partnerTitle}}</h3>
+                                    <img src="{{partnerLogo}}" alt="{{partnerAlt}}" style="max-width: 200px; margin: 15px 0;">
+                                    <p>{{partnerContent}}</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'partnerTitle', label: 'Titel', type: 'text', default: 'News von unseren Partnern' },
+                    { name: 'partnerLogo', label: 'Partner Logo URL', type: 'image', default: 'https://via.placeholder.com/200x80' },
+                    { name: 'partnerAlt', label: 'Logo Alt-Text', type: 'text', default: 'Partner Logo' },
+                    { name: 'partnerContent', label: 'Inhalt', type: 'textarea', default: 'Informationen über unsere Partner.' }
+                ]
+            },
+            'footer-imprint': {
+                title: 'Footer/Impressum',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 20px 30px; text-align: center; font-size: 12px; color: #666;">
+                                    <p>Start with a Friend e.V.</p>
+                                    <p>Wiclefstraße 17, 10551 Berlin</p>
+                                    <p>Tel: +49 30 5557 7855</p>
+                                    <p>E-Mail: info@start-with-a-friend.de</p>
+                                    <p style="margin-top: 10px;">
+                                        <a href="https://www.start-with-a-friend.de" style="color: #009a93;">Website</a> |
+                                        <a href="https://www.facebook.com/startwithafriend" style="color: #009a93;">Facebook</a> |
+                                        <a href="https://www.instagram.com/teamswaf" style="color: #009a93;">Instagram</a>
+                                    </p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: []
+            },
+            'unsubscribe': {
+                title: 'Abmelde-Link',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 20px 30px; text-align: center; color: #666; font-size: 12px;">
+                                    <p>{{unsubscribeText}} <a href="<!--#unsubscribe#-->" style="color: #666;">{{unsubscribeLinkText}}</a></p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'unsubscribeText', label: 'Abmelde-Text', type: 'text', default: 'Wenn Sie diese E-Mail nicht mehr empfangen möchten, können Sie diese' },
+                    { name: 'unsubscribeLinkText', label: 'Link Text', type: 'text', default: 'hier kostenlos abbestellen' }
+                ]
+            }
+        };
+
+        // Template Builder Class
+        class TemplateBuilder {
+            constructor() {
+                this.modules = [];
+                this.moduleCounter = 0;
+                this.currentEditingModule = null;
+                this.init();
+            }
+
+            init() {
+                this.setupEventListeners();
+                this.setupDragAndDrop();
+                this.loadAutoSave();
+            }
+
+            setupEventListeners() {
+                // Header buttons
+                document.getElementById('newTemplateBtn').addEventListener('click', () => this.newTemplate());
+                document.getElementById('saveTemplateBtn').addEventListener('click', () => this.saveTemplate());
+                document.getElementById('loadTemplateBtn').addEventListener('click', () => this.loadTemplate());
+                document.getElementById('exportTemplateBtn').addEventListener('click', () => this.exportJSON());
+                document.getElementById('importTemplateBtn').addEventListener('click', () => this.importJSON());
+                document.getElementById('previewBtn').addEventListener('click', () => this.showPreview());
+                document.getElementById('exportHTMLBtn').addEventListener('click', () => this.exportHTML());
+                
+                // Editor actions
+                document.getElementById('clearTemplateBtn').addEventListener('click', () => this.clearTemplate());
+                document.getElementById('generateHTMLBtn').addEventListener('click', () => this.generateHTML());
+                
+                // Modal actions
+                document.getElementById('cancelModuleEdit').addEventListener('click', () => this.closeModuleEditor());
+                document.getElementById('saveModuleEdit').addEventListener('click', () => this.saveModuleEdit());
+                document.getElementById('closePreview').addEventListener('click', () => this.closePreview());
+                
+                // Module editor tabs
+                document.querySelectorAll('.module-editor-tab').forEach(tab => {
+                    tab.addEventListener('click', (e) => this.switchTab(e.target.dataset.tab));
+                });
+                
+                // Overlay
+                document.getElementById('overlay').addEventListener('click', () => {
+                    this.closeModuleEditor();
+                    this.closePreview();
+                });
+                
+                // Auto-save on changes
+                document.getElementById('templateTitle').addEventListener('input', () => this.autoSave());
+            }
+
+            setupDragAndDrop() {
+                const sidebar = document.querySelector('.sidebar');
+                const previewArea = document.querySelector('.preview-content');
+                
+                // Sidebar modules
+                sidebar.querySelectorAll('.module').forEach(module => {
+                    module.addEventListener('dragstart', (e) => {
+                        e.dataTransfer.effectAllowed = 'copy';
+                        e.dataTransfer.setData('moduleType', module.dataset.moduleType);
+                        e.dataTransfer.setData('action', 'add');
+                    });
+                });
+                
+                // Preview area
+                previewArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                    previewArea.classList.add('drag-over');
+                });
+                
+                previewArea.addEventListener('dragleave', () => {
+                    previewArea.classList.remove('drag-over');
+                });
+                
+                previewArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    previewArea.classList.remove('drag-over');
+                    
+                    const action = e.dataTransfer.getData('action');
+                    
+                    if (action === 'add') {
+                        const moduleType = e.dataTransfer.getData('moduleType');
+                        this.addModule(moduleType);
+                    }
+                });
+            }
+
+            addModule(type) {
+                const template = MODULE_TEMPLATES[type];
+                if (!template) return;
+                
+                const moduleId = `module-${++this.moduleCounter}`;
+                const moduleData = {
+                    id: moduleId,
+                    type: type,
+                    fields: {}
+                };
+                
+                // Set default values
+                template.fields.forEach(field => {
+                    moduleData.fields[field.name] = field.default;
+                });
+                
+                this.modules.push(moduleData);
+                this.renderModule(moduleData);
+                this.autoSave();
+                this.showNotification('Modul hinzugefügt');
+            }
+
+            renderModule(moduleData) {
+                const previewContent = document.getElementById('previewContent');
+                
+                // Clear placeholder if this is the first module
+                if (this.modules.length === 1) {
+                    previewContent.innerHTML = '';
+                }
+                
+                const moduleElement = document.createElement('div');
+                moduleElement.className = 'template-module';
+                moduleElement.id = moduleData.id;
+                moduleElement.draggable = true;
+                
+                const template = MODULE_TEMPLATES[moduleData.type];
+                
+                moduleElement.innerHTML = `
+                    <div class="module-header">
+                        <div class="module-header-left">
+                            <span class="module-drag-handle"></span>
+                            <span class="module-title">${template.title}</span>
+                        </div>
+                        <div class="module-actions">
+                            <button class="edit-module" onclick="templateBuilder.editModule('${moduleData.id}')">✎ Bearbeiten</button>
+                            <button class="duplicate-module" onclick="templateBuilder.duplicateModule('${moduleData.id}')">⎘ Duplizieren</button>
+                            <button class="delete-module" onclick="templateBuilder.deleteModule('${moduleData.id}')">✕ Löschen</button>
+                        </div>
+                    </div>
+                    <div class="module-content">
+                        ${this.renderModuleContent(moduleData)}
+                    </div>
+                `;
+                
+                previewContent.appendChild(moduleElement);
+                this.setupModuleDragAndDrop(moduleElement);
+            }
+
+            renderModuleContent(moduleData) {
+                const template = MODULE_TEMPLATES[moduleData.type];
+                let html = template.html;
+                
+                // Special handling for events module
+                if (moduleData.type === 'events') {
+                    const events = moduleData.fields.events || [];
+                    let eventsHtml = '<h2 style="color: #009a93; text-align: center; margin: 20px 0;">' + 
+                                     (moduleData.fields.eventsTitle || 'Unsere nächsten Events') + '</h2>';
+                    
+                    if (events.length === 0) {
+                        eventsHtml += '<p style="text-align: center; color: #666;">Keine Events vorhanden. Klicken Sie auf "Bearbeiten" um Events hinzuzufügen.</p>';
+                    } else {
+                        events.forEach(event => {
+                            eventsHtml += this.renderEventHTML(event);
+                        });
+                    }
+                    
+                    html = html.replace('{{eventsContent}}', eventsHtml);
+                } else {
+                    // Replace placeholders with field values
+                    template.fields.forEach(field => {
+                        const value = moduleData.fields[field.name] || field.default;
+                        const regex = new RegExp(`{{${field.name}}}`, 'g');
+                        html = html.replace(regex, value);
+                    });
+                }
+                
+                return html;
+            }
+
+            renderEventHTML(event) {
+                return `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 15px 30px;">
+                                    <table style="width: 100%; border: 1px solid #e0e0e0; border-radius: 8px;">
+                                        <tr>
+                                            <td style="padding: 20px;">
+                                                <table>
+                                                    <tr>
+                                                        <td style="width: 60px; vertical-align: top;">
+                                                            <div style="background: #009a93; color: white; padding: 8px; border-radius: 4px; text-align: center;">
+                                                                <div style="font-size: 11px;">${event.month || 'TBD'}</div>
+                                                                <div style="font-size: 20px; font-weight: bold;">${event.day || '?'}</div>
+                                                            </div>
+                                                        </td>
+                                                        <td style="padding-left: 20px;">
+                                                            <h3 style="color: #009a93; margin: 0 0 10px 0;">${event.title}</h3>
+                                                            <p style="margin: 5px 0;"><strong>Zeit:</strong> ${event.time}</p>
+                                                            <p style="margin: 5px 0;"><strong>Ort:</strong> ${event.location}</p>
+                                                            <p style="margin: 10px 0;">${event.description}</p>
+                                                            ${event.registrationLink ? `<a href="${event.registrationLink}" style="color: #009a93;">Jetzt anmelden →</a>` : ''}
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            setupModuleDragAndDrop(moduleElement) {
+                moduleElement.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('moduleId', moduleElement.id);
+                    e.dataTransfer.setData('action', 'move');
+                    moduleElement.classList.add('dragging');
+                });
+                
+                moduleElement.addEventListener('dragend', () => {
+                    moduleElement.classList.remove('dragging');
+                });
+                
+                moduleElement.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    const draggingElement = document.querySelector('.dragging');
+                    if (draggingElement && draggingElement !== moduleElement) {
+                        const rect = moduleElement.getBoundingClientRect();
+                        const y = e.clientY - rect.top;
+                        
+                        if (y < rect.height / 2) {
+                            moduleElement.style.borderTop = '2px solid #009a93';
+                            moduleElement.style.borderBottom = '';
+                        } else {
+                            moduleElement.style.borderBottom = '2px solid #009a93';
+                            moduleElement.style.borderTop = '';
+                        }
+                    }
+                });
+                
+                moduleElement.addEventListener('dragleave', () => {
+                    moduleElement.style.borderTop = '';
+                    moduleElement.style.borderBottom = '';
+                });
+                
+                moduleElement.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    moduleElement.style.borderTop = '';
+                    moduleElement.style.borderBottom = '';
+                    
+                    const action = e.dataTransfer.getData('action');
+                    
+                    if (action === 'move') {
+                        const draggedId = e.dataTransfer.getData('moduleId');
+                        const draggedElement = document.getElementById(draggedId);
+                        
+                        if (draggedElement && draggedElement !== moduleElement) {
+                            const rect = moduleElement.getBoundingClientRect();
+                            const y = e.clientY - rect.top;
+                            
+                            if (y < rect.height / 2) {
+                                moduleElement.parentNode.insertBefore(draggedElement, moduleElement);
+                            } else {
+                                moduleElement.parentNode.insertBefore(draggedElement, moduleElement.nextSibling);
+                            }
+                            
+                            this.updateModulesOrder();
+                        }
+                    }
+                });
+            }
+
+            updateModulesOrder() {
+                const moduleElements = document.querySelectorAll('.template-module');
+                const newOrder = [];
+                
+                moduleElements.forEach(element => {
+                    const module = this.modules.find(m => m.id === element.id);
+                    if (module) {
+                        newOrder.push(module);
+                    }
+                });
+                
+                this.modules = newOrder;
+                this.autoSave();
+            }
+
+            editModule(moduleId) {
+                const module = this.modules.find(m => m.id === moduleId);
+                if (!module) return;
+                
+                this.currentEditingModule = module;
+                const template = MODULE_TEMPLATES[module.type];
+                
+                document.getElementById('moduleEditorTitle').textContent = `${template.title} bearbeiten`;
+                
+                // Build editor content
+                let editorHTML = '<div id="contentTab" class="tab-content">';
+                
+                // Special handling for events module
+                if (module.type === 'events') {
+                    editorHTML += this.buildEventsEditor(module);
+                } else {
+                    template.fields.forEach(field => {
+                        editorHTML += this.buildFieldEditor(field, module.fields[field.name]);
+                    });
+                }
+                
+                editorHTML += '</div>';
+                editorHTML += '<div id="settingsTab" class="tab-content" style="display: none;">';
+                editorHTML += '<p>Hier können Sie erweiterte Einstellungen vornehmen.</p>';
+                editorHTML += '</div>';
+                
+                document.getElementById('moduleEditorContent').innerHTML = editorHTML;
+                
+                // Show modal
+                document.getElementById('moduleEditorModal').style.display = 'block';
+                document.getElementById('overlay').style.display = 'block';
+                
+                // Setup image upload buttons
+                this.setupImageUploads();
+            }
+
+            buildEventsEditor(module) {
+                let html = '<div class="field-group">';
+                html += '<label for="eventsTitle">Events Überschrift</label>';
+                html += `<input type="text" id="eventsTitle" name="eventsTitle" value="${module.fields.eventsTitle || 'Unsere nächsten Events'}">`;
+                html += '</div>';
+                
+                html += '<div class="field-group">';
+                html += '<label>Events</label>';
+                html += '<button class="primary-btn" onclick="templateBuilder.showEventScraper()">Events importieren</button>';
+                html += '<div class="dynamic-items-list" style="margin-top: 15px;">';
+                
+                const events = module.fields.events || [];
+                events.forEach((event, index) => {
+                    html += this.buildEventCard(event, index);
+                });
+                
+                if (events.length === 0) {
+                    html += '<p style="color: #666;">Keine Events vorhanden. Nutzen Sie den Import-Button oder fügen Sie manuell Events hinzu.</p>';
+                }
+                
+                html += '</div>';
+                html += '<button class="secondary-btn" onclick="templateBuilder.addManualEvent()" style="margin-top: 10px;">+ Event manuell hinzufügen</button>';
+                html += '</div>';
+                
+                return html;
+            }
+
+            buildEventCard(event, index) {
+                return `
+                    <div class="event-card" data-index="${index}">
+                        <div class="event-card-header">
+                            <div style="display: flex; align-items: start; gap: 15px; flex: 1;">
+                                <div class="event-date-box">
+                                    <div class="event-date-month">${event.month || 'TBD'}</div>
+                                    <div class="event-date-day">${event.day || '?'}</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <input type="text" value="${event.title}" onchange="templateBuilder.updateEvent(${index}, 'title', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Event Titel">
+                                    <input type="text" value="${event.time}" onchange="templateBuilder.updateEvent(${index}, 'time', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Uhrzeit">
+                                    <input type="text" value="${event.location}" onchange="templateBuilder.updateEvent(${index}, 'location', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Ort">
+                                    <textarea onchange="templateBuilder.updateEvent(${index}, 'description', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Beschreibung">${event.description}</textarea>
+                                    <input type="text" value="${event.registrationLink || ''}" onchange="templateBuilder.updateEvent(${index}, 'registrationLink', this.value)" style="width: 100%;" placeholder="Anmelde-Link (optional)">
+                                </div>
+                            </div>
+                            <div class="event-badges">
+                                ${event.category ? `<span class="badge badge-category">${event.category}</span>` : ''}
+                                ${event.eventMode ? `<span class="badge badge-mode">${event.eventMode}</span>` : ''}
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; text-align: right;">
+                            <button class="delete-module" onclick="templateBuilder.removeEvent(${index})">Event löschen</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            buildFieldEditor(field, value) {
+                let html = '<div class="field-group">';
+                html += `<label for="${field.name}">${field.label}</label>`;
+                
+                switch (field.type) {
+                    case 'textarea':
+                        html += `<textarea id="${field.name}" name="${field.name}">${value || field.default}</textarea>`;
+                        break;
+                    case 'image':
+                        html += `<input type="text" id="${field.name}" name="${field.name}" value="${value || field.default}">`;
+                        html += `<button class="image-upload-btn" data-field="${field.name}">Bild hochladen</button>`;
+                        if (value) {
+                            html += `<div class="image-preview"><img src="${value}" alt="Vorschau"></div>`;
+                        }
+                        break;
+                    default:
+                        html += `<input type="text" id="${field.name}" name="${field.name}" value="${value || field.default}">`;
+                }
+                
+                html += '</div>';
+                return html;
+            }
+
+            setupImageUploads() {
+                document.querySelectorAll('.image-upload-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const fieldName = e.target.dataset.field;
+                        this.uploadImage(fieldName);
+                    });
+                });
+            }
+
+            uploadImage(fieldName) {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            const dataUrl = e.target.result;
+                            document.getElementById(fieldName).value = dataUrl;
+                            
+                            // Update preview
+                            let preview = document.querySelector(`#${fieldName}`).parentElement.querySelector('.image-preview');
+                            if (!preview) {
+                                preview = document.createElement('div');
+                                preview.className = 'image-preview';
+                                document.querySelector(`#${fieldName}`).parentElement.appendChild(preview);
+                            }
+                            preview.innerHTML = `<img src="${dataUrl}" alt="Vorschau">`;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+                
+                input.click();
+            }
+
+            showEventScraper() {
+                document.getElementById('eventScraperModal').style.display = 'block';
+                document.getElementById('overlay').style.display = 'block';
+                
+                // Setup scraper buttons
+                document.getElementById('cancelEventScraper').onclick = () => {
+                    document.getElementById('eventScraperModal').style.display = 'none';
+                    document.getElementById('overlay').style.display = 'none';
+                };
+                
+                document.getElementById('runEventScraper').onclick = () => {
+                    this.importEvents();
+                };
+            }
+
+            importEvents() {
+                // Simulate event import
+                const sampleEvents = [
+                    {
+                        title: 'Community Event Berlin',
+                        month: 'Jan',
+                        day: '15',
+                        time: '18:00 - 20:00 Uhr',
+                        location: 'Berlin, Alexanderplatz',
+                        description: 'Komm zu unserem monatlichen Community-Treffen!',
+                        category: 'Community Event',
+                        eventMode: 'Offline',
+                        registrationLink: 'https://www.start-with-a-friend.de/events'
+                    },
+                    {
+                        title: 'Online Info-Abend',
+                        month: 'Jan',
+                        day: '22',
+                        time: '19:00 - 20:30 Uhr',
+                        location: 'Online via Zoom',
+                        description: 'Erfahre mehr über Start with a Friend und wie du mitmachen kannst.',
+                        category: 'Infoabend',
+                        eventMode: 'Online',
+                        registrationLink: 'https://www.start-with-a-friend.de/events'
+                    }
+                ];
+                
+                if (this.currentEditingModule) {
+                    if (!this.currentEditingModule.fields.events) {
+                        this.currentEditingModule.fields.events = [];
+                    }
+                    this.currentEditingModule.fields.events.push(...sampleEvents);
+                    
+                    // Refresh editor
+                    this.editModule(this.currentEditingModule.id);
+                }
+                
+                document.getElementById('eventScraperModal').style.display = 'none';
+                this.showNotification('Events importiert');
+            }
+
+            addManualEvent() {
+                if (!this.currentEditingModule) return;
+                
+                const newEvent = {
+                    title: 'Neues Event',
+                    month: 'TBD',
+                    day: '?',
+                    time: '',
+                    location: '',
+                    description: '',
+                    category: '',
+                    eventMode: '',
+                    registrationLink: ''
+                };
+                
+                if (!this.currentEditingModule.fields.events) {
+                    this.currentEditingModule.fields.events = [];
+                }
+                
+                this.currentEditingModule.fields.events.push(newEvent);
+                
+                // Refresh editor
+                this.editModule(this.currentEditingModule.id);
+            }
+
+            updateEvent(index, field, value) {
+                if (this.currentEditingModule && this.currentEditingModule.fields.events) {
+                    this.currentEditingModule.fields.events[index][field] = value;
+                    
+                    // Update date display if date field is changed
+                    if (field === 'date' && value) {
+                        const date = new Date(value);
+                        const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+                        this.currentEditingModule.fields.events[index].month = months[date.getMonth()];
+                        this.currentEditingModule.fields.events[index].day = date.getDate().toString();
+                    }
+                }
+            }
+
+            removeEvent(index) {
+                if (this.currentEditingModule && this.currentEditingModule.fields.events) {
+                    this.currentEditingModule.fields.events.splice(index, 1);
+                    
+                    // Refresh editor
+                    this.editModule(this.currentEditingModule.id);
+                }
+            }
+
+            switchTab(tabName) {
+                document.querySelectorAll('.module-editor-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+                
+                document.getElementById('contentTab').style.display = tabName === 'content' ? 'block' : 'none';
+                document.getElementById('settingsTab').style.display = tabName === 'settings' ? 'block' : 'none';
+            }
+
+            saveModuleEdit() {
+                if (!this.currentEditingModule) return;
+                
+                const template = MODULE_TEMPLATES[this.currentEditingModule.type];
+                
+                // Save regular fields
+                template.fields.forEach(field => {
+                    if (field.type !== 'dynamic-list') {
+                        const input = document.getElementById(field.name);
+                        if (input) {
+                            this.currentEditingModule.fields[field.name] = input.value;
+                        }
+                    }
+                });
+                
+                // Update module display
+                const moduleElement = document.getElementById(this.currentEditingModule.id);
+                if (moduleElement) {
+                    const contentElement = moduleElement.querySelector('.module-content');
+                    contentElement.innerHTML = this.renderModuleContent(this.currentEditingModule);
+                }
+                
+                this.closeModuleEditor();
+                this.autoSave();
+                this.showNotification('Modul aktualisiert');
+            }
+
+            closeModuleEditor() {
+                document.getElementById('moduleEditorModal').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
+                this.currentEditingModule = null;
+            }
+
+            duplicateModule(moduleId) {
+                const module = this.modules.find(m => m.id === moduleId);
+                if (!module) return;
+                
+                const newModule = JSON.parse(JSON.stringify(module));
+                newModule.id = `module-${++this.moduleCounter}`;
+                
+                const index = this.modules.indexOf(module);
+                this.modules.splice(index + 1, 0, newModule);
+                
+                const moduleElement = document.getElementById(moduleId);
+                const newElement = moduleElement.cloneNode(true);
+                newElement.id = newModule.id;
+                
+                // Update event handlers
+                newElement.querySelector('.edit-module').setAttribute('onclick', `templateBuilder.editModule('${newModule.id}')`);
+                newElement.querySelector('.duplicate-module').setAttribute('onclick', `templateBuilder.duplicateModule('${newModule.id}')`);
+                newElement.querySelector('.delete-module').setAttribute('onclick', `templateBuilder.deleteModule('${newModule.id}')`);
+                
+                moduleElement.parentNode.insertBefore(newElement, moduleElement.nextSibling);
+                this.setupModuleDragAndDrop(newElement);
+                
+                this.autoSave();
+                this.showNotification('Modul dupliziert');
+            }
+
+            deleteModule(moduleId) {
+                if (!confirm('Möchten Sie dieses Modul wirklich löschen?')) return;
+                
+                const index = this.modules.findIndex(m => m.id === moduleId);
+                if (index > -1) {
+                    this.modules.splice(index, 1);
+                    document.getElementById(moduleId).remove();
+                    
+                    if (this.modules.length === 0) {
+                        document.getElementById('previewContent').innerHTML = `
+                            <div style="padding: 40px; text-align: center; color: #999;">
+                                <p>Ziehen Sie Module aus der Seitenleiste hierher, um Ihr Template zu erstellen.</p>
+                            </div>
+                        `;
+                    }
+                    
+                    this.autoSave();
+                    this.showNotification('Modul gelöscht');
+                }
+            }
+
+            newTemplate() {
+                if (this.modules.length > 0) {
+                    if (!confirm('Alle nicht gespeicherten Änderungen gehen verloren. Fortfahren?')) {
+                        return;
+                    }
+                }
+                
+                this.modules = [];
+                this.moduleCounter = 0;
+                document.getElementById('templateTitle').value = '';
+                document.getElementById('previewContent').innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: #999;">
+                        <p>Ziehen Sie Module aus der Seitenleiste hierher, um Ihr Template zu erstellen.</p>
+                    </div>
+                `;
+                
+                localStorage.removeItem('swafTemplateAutoSave');
+                this.showNotification('Neues Template erstellt');
+            }
+
+            clearTemplate() {
+                if (confirm('Möchten Sie wirklich alle Module entfernen?')) {
+                    this.modules = [];
+                    document.getElementById('previewContent').innerHTML = `
+                        <div style="padding: 40px; text-align: center; color: #999;">
+                            <p>Ziehen Sie Module aus der Seitenleiste hierher, um Ihr Template zu erstellen.</p>
+                        </div>
+                    `;
+                    this.autoSave();
+                    this.showNotification('Template geleert');
+                }
+            }
+
+            saveTemplate() {
+                const templateName = document.getElementById('templateTitle').value || 'Unbenanntes Template';
+                const templateData = {
+                    name: templateName,
+                    modules: this.modules,
+                    savedAt: new Date().toISOString()
+                };
+                
+                // Get existing templates
+                const templates = JSON.parse(localStorage.getItem('swafTemplates') || '[]');
+                
+                // Check if template with same name exists
+                const existingIndex = templates.findIndex(t => t.name === templateName);
+                
+                if (existingIndex > -1) {
+                    if (confirm('Ein Template mit diesem Namen existiert bereits. Überschreiben?')) {
+                        templates[existingIndex] = templateData;
+                    } else {
+                        return;
+                    }
+                } else {
+                    templates.push(templateData);
+                }
+                
+                localStorage.setItem('swafTemplates', JSON.stringify(templates));
+                this.showNotification('Template gespeichert');
+            }
+
+            loadTemplate() {
+                const templates = JSON.parse(localStorage.getItem('swafTemplates') || '[]');
+                
+                if (templates.length === 0) {
+                    this.showNotification('Keine gespeicherten Templates vorhanden', true);
+                    return;
+                }
+                
+                // Create a simple selection dialog
+                const templateList = templates.map((t, i) => `${i + 1}. ${t.name} (${new Date(t.savedAt).toLocaleDateString()})`).join('\n');
+                const selection = prompt(`Wählen Sie ein Template (Nummer eingeben):\n\n${templateList}`);
+                
+                if (selection) {
+                    const index = parseInt(selection) - 1;
+                    if (templates[index]) {
+                        this.loadTemplateData(templates[index]);
+                    }
+                }
+            }
+
+            loadTemplateData(templateData) {
+                this.modules = templateData.modules;
+                document.getElementById('templateTitle').value = templateData.name;
+                
+                // Clear and rebuild preview
+                document.getElementById('previewContent').innerHTML = '';
+                this.modules.forEach(module => {
+                    this.renderModule(module);
+                });
+                
+                this.showNotification('Template geladen');
+            }
+
+            exportJSON() {
+                const templateData = {
+                    name: document.getElementById('templateTitle').value || 'template',
+                    modules: this.modules,
+                    exportedAt: new Date().toISOString(),
+                    version: '1.0'
+                };
+                
+                const dataStr = JSON.stringify(templateData, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                
+                const exportLink = document.createElement('a');
+                exportLink.setAttribute('href', dataUri);
+                exportLink.setAttribute('download', `${templateData.name.replace(/\s+/g, '_')}.json`);
+                exportLink.click();
+                
+                this.showNotification('Template als JSON exportiert');
+            }
+
+            importJSON() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = '.json';
+                
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            try {
+                                const templateData = JSON.parse(e.target.result);
+                                this.loadTemplateData(templateData);
+                            } catch (error) {
+                                this.showNotification('Fehler beim Importieren der Datei', true);
+                            }
+                        };
+                        reader.readAsText(file);
+                    }
+                });
+                
+                input.click();
+            }
+
+            generateHTML() {
+                const html = this.buildCompleteHTML();
+                
+                // Create download link
+                const blob = new Blob([html], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${document.getElementById('templateTitle').value || 'newsletter'}.html`;
+                link.click();
+                
+                URL.revokeObjectURL(url);
+                this.showNotification('HTML generiert und heruntergeladen');
+            }
+
+            exportHTML() {
+                this.generateHTML();
+            }
+
+            buildCompleteHTML() {
+                let html = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${document.getElementById('templateTitle').value || 'Newsletter'}</title>
+    <style type="text/css">
+        body { margin: 0; padding: 0; font-family: 'GT Walsheim', Arial, sans-serif; }
+        table { border-collapse: collapse; }
+        td { padding: 0; }
+        img { border: 0; display: block; }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f5f5f5;">
+    <center>
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f5;">
+            <tr>
+                <td align="center" valign="top">`;
+                
+                this.modules.forEach(module => {
+                    html += this.renderModuleContent(module);
+                });
+                
+                html += `
+                </td>
+            </tr>
+        </table>
+    </center>
+</body>
+</html>`;
+                
+                return html;
+            }
+
+            showPreview() {
+                const html = this.buildCompleteHTML();
+                const iframe = document.getElementById('previewFrame');
+                
+                iframe.srcdoc = html;
+                document.getElementById('previewModal').style.display = 'block';
+                document.getElementById('overlay').style.display = 'block';
+            }
+
+            closePreview() {
+                document.getElementById('previewModal').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
+            }
+
+            autoSave() {
+                const autoSaveData = {
+                    name: document.getElementById('templateTitle').value,
+                    modules: this.modules,
+                    savedAt: new Date().toISOString()
+                };
+                
+                localStorage.setItem('swafTemplateAutoSave', JSON.stringify(autoSaveData));
+            }
+
+            loadAutoSave() {
+                const autoSaveData = localStorage.getItem('swafTemplateAutoSave');
+                
+                if (autoSaveData) {
+                    try {
+                        const data = JSON.parse(autoSaveData);
+                        
+                        if (confirm('Es wurde eine automatisch gespeicherte Version gefunden. Möchten Sie diese laden?')) {
+                            this.loadTemplateData(data);
+                        }
+                    } catch (error) {
+                        console.error('Error loading autosave:', error);
+                    }
+                }
+            }
+
+            showNotification(message, isError = false) {
+                const notification = document.createElement('div');
+                notification.className = 'notification' + (isError ? ' error' : '');
+                notification.textContent = message;
+                
+                document.body.appendChild(notification);
+                
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+
+        // Initialize the application
+        const templateBuilder = new TemplateBuilder();
+    </script>
+</body>
+</html>
