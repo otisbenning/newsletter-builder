@@ -1483,16 +1483,20 @@
             addManualEvent() {
                 if (!this.currentEditingModule) return;
                 
+                const today = new Date();
+                const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+                
                 const newEvent = {
-                    title: 'Neues Event',
-                    month: 'TBD',
-                    day: '?',
-                    time: '',
-                    location: '',
-                    description: '',
-                    category: '',
-                    eventMode: '',
-                    registrationLink: ''
+                    title: 'Neues Event - {FIRSTNAME[std:Hi]}, sei dabei!',
+                    month: months[today.getMonth()],
+                    day: today.getDate().toString(),
+                    date: today.toISOString().split('T')[0],
+                    time: '18:00 - 20:00 Uhr',
+                    location: 'Berlin',
+                    description: 'Beschreibung des Events hier eingeben...',
+                    category: 'Community Event',
+                    eventMode: 'Offline',
+                    registrationLink: 'https://portal.startwithafriend.de/events'
                 };
                 
                 if (!this.currentEditingModule.fields.events) {
