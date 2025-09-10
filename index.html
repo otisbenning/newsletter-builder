@@ -235,6 +235,12 @@
             background-color: #f0f0f0;
         }
 
+        .move-up, .move-down {
+            color: #666;
+            padding: 4px 6px !important;
+            font-size: 16px !important;
+        }
+
         .edit-module {
             color: #0066cc;
         }
@@ -256,7 +262,7 @@
             padding: 12px 16px;
             border-top: 1px solid #e5e5e5;
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             gap: 10px;
             background-color: white;
         }
@@ -453,6 +459,72 @@
             background: var(--dark-color);
         }
 
+        /* Bookmarklet Box */
+        .bookmarklet-box {
+            background: #f8f9fa;
+            border: 2px dashed var(--primary-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .bookmarklet-link {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .bookmarklet-link:hover {
+            background: #007a73;
+        }
+
+        /* Paste Events Box */
+        .paste-events-box {
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 15px 0;
+            background: #f9f9f9;
+        }
+
+        .paste-events-textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        /* Copy HTML Box */
+        .copy-html-box {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .html-preview {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 11px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            margin-bottom: 10px;
+        }
+
         /* Image Upload */
         .image-upload-btn {
             background-color: var(--primary-color);
@@ -515,6 +587,10 @@
             background-color: var(--accent-color);
         }
 
+        .notification.success {
+            background-color: #28a745;
+        }
+
         @keyframes slideIn {
             from {
                 transform: translateX(100%);
@@ -534,21 +610,6 @@
         .drag-over {
             border: 2px dashed var(--primary-color);
             background-color: rgba(0, 153, 147, 0.05);
-        }
-
-        /* Event Scraper Specific */
-        .scraper-container {
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .scraper-filters {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-bottom: 15px;
         }
 
         /* Responsive */
@@ -595,13 +656,13 @@
                 <button id="importTemplateBtn" title="JSON importieren">Import JSON</button>
                 <div class="header-button-separator"></div>
                 <button id="previewBtn" title="Vorschau">Vorschau</button>
-                <button id="exportHTMLBtn" title="HTML für Cleverreach exportieren">HTML Export</button>
+                <button id="copyHTMLBtn" title="HTML kopieren">📋 HTML kopieren</button>
             </div>
         </header>
 
         <div class="main-content">
             <aside class="sidebar">
-                <h3>Module</h3>
+                <h3>Pflicht-Module</h3>
                 <div class="modules-list">
                     <div class="module" draggable="true" data-module-type="preheader">
                         <span class="module-drag-handle"></span>
@@ -611,9 +672,33 @@
                         <span class="module-drag-handle"></span>
                         <span class="module-title">Header (Logo)</span>
                     </div>
+                    <div class="module" draggable="true" data-module-type="footer-imprint">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Footer/Impressum</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="unsubscribe">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Abmelde-Link</span>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 20px;">Inhalts-Module</h3>
+                <div class="modules-list">
+                    <div class="module" draggable="true" data-module-type="hero-image">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Hero Bild</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="greeting">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Begrüßung</span>
+                    </div>
                     <div class="module" draggable="true" data-module-type="image-text">
                         <span class="module-drag-handle"></span>
                         <span class="module-title">Bild & Text</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="text-only">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Nur Text</span>
                     </div>
                     <div class="module" draggable="true" data-module-type="events">
                         <span class="module-drag-handle"></span>
@@ -623,9 +708,25 @@
                         <span class="module-drag-handle"></span>
                         <span class="module-title">Zwei Spalten</span>
                     </div>
+                    <div class="module" draggable="true" data-module-type="three-columns">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Drei Spalten</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="quote">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Zitat</span>
+                    </div>
                     <div class="module" draggable="true" data-module-type="cta-section">
                         <span class="module-drag-handle"></span>
                         <span class="module-title">Call-to-Action</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="button-center">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Button (zentriert)</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="social-media">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Social Media</span>
                     </div>
                     <div class="module" draggable="true" data-module-type="contact-person">
                         <span class="module-drag-handle"></span>
@@ -635,13 +736,9 @@
                         <span class="module-drag-handle"></span>
                         <span class="module-title">Partner News</span>
                     </div>
-                    <div class="module" draggable="true" data-module-type="footer-imprint">
+                    <div class="module" draggable="true" data-module-type="divider">
                         <span class="module-drag-handle"></span>
-                        <span class="module-title">Footer/Impressum</span>
-                    </div>
-                    <div class="module" draggable="true" data-module-type="unsubscribe">
-                        <span class="module-drag-handle"></span>
-                        <span class="module-title">Abmelde-Link</span>
+                        <span class="module-title">Trennlinie</span>
                     </div>
                 </div>
             </aside>
@@ -660,8 +757,12 @@
                     </div>
                 </div>
                 <div class="editor-actions">
-                    <button class="secondary-btn" id="clearTemplateBtn">Template leeren</button>
-                    <button class="primary-btn" id="generateHTMLBtn">HTML generieren</button>
+                    <div>
+                        <button class="secondary-btn" id="clearTemplateBtn">Template leeren</button>
+                    </div>
+                    <div>
+                        <button class="primary-btn" id="generateHTMLBtn">HTML als Datei exportieren</button>
+                    </div>
                 </div>
             </main>
         </div>
@@ -687,49 +788,64 @@
         </div>
     </div>
 
-    <!-- Event Scraper Modal -->
-    <div id="eventScraperModal" class="modal">
-        <div class="modal-content">
+    <!-- Event Import Modal -->
+    <div id="eventImportModal" class="modal">
+        <div class="modal-content" style="min-width: 600px;">
             <div class="modal-header">
                 <h2>Events importieren</h2>
             </div>
-            <div class="scraper-container">
-                <p>Importieren Sie aktuelle Events von der Kerberos Compliance Website.</p>
-                <div class="scraper-filters">
-                    <div class="field-group">
-                        <label for="location-filter">Standort</label>
-                        <select id="location-filter">
-                            <option value="all">Alle Standorte</option>
-                            <option value="berlin">Berlin</option>
-                            <option value="hamburg">Hamburg</option>
-                            <option value="muenchen">München</option>
-                            <option value="koeln">Köln</option>
-                            <option value="frankfurt">Frankfurt</option>
-                        </select>
-                    </div>
-                    <div class="field-group">
-                        <label for="category-filter">Kategorie</label>
-                        <select id="category-filter">
-                            <option value="all">Alle Kategorien</option>
-                            <option value="communityevent">Community Event</option>
-                            <option value="infoabend">Infoabend</option>
-                            <option value="workshop">Workshop</option>
-                            <option value="training">Training</option>
-                        </select>
-                    </div>
-                    <div class="field-group">
-                        <label for="event-mode-filter">Format</label>
-                        <select id="event-mode-filter">
-                            <option value="all">Alle Formate</option>
-                            <option value="online">Online</option>
-                            <option value="offline">Offline</option>
-                        </select>
-                    </div>
-                </div>
+            
+            <div class="bookmarklet-box">
+                <h3>1. Bookmarklet installieren</h3>
+                <p>Ziehen Sie diesen Button in Ihre Lesezeichen-Leiste:</p>
+                <a href="javascript:(function(){var events=[];document.querySelectorAll('[class*=&quot;event&quot;],[class*=&quot;Event&quot;],article,.card,.list-item').forEach(function(el){var event={};var dateMatch=(el.textContent||'').match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/);if(dateMatch){var date=new Date(parseInt(dateMatch[3])<100?2000+parseInt(dateMatch[3]):dateMatch[3],dateMatch[2]-1,dateMatch[1]);var months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];event.month=months[date.getMonth()];event.day=date.getDate().toString();event.date=date.toISOString().split('T')[0];}var title=el.querySelector('h1,h2,h3,h4,h5,[class*=&quot;title&quot;]');event.title=title?title.textContent.trim():'Event';var timeMatch=(el.textContent||'').match(/(\d{1,2}):(\d{2})(\s*-\s*\d{1,2}:\d{2})?(\s*Uhr)?/i);event.time=timeMatch?timeMatch[0]:'';var text=el.textContent||'';['Berlin','Hamburg','München','Köln','Frankfurt','Stuttgart','Dresden','Leipzig','Online','Zoom'].forEach(function(loc){if(text.includes(loc))event.location=event.location||loc;});event.location=event.location||'';var desc=el.querySelector('p,[class*=&quot;description&quot;]');event.description=desc?desc.textContent.trim().substring(0,200):'';event.category=text.toLowerCase().includes('workshop')?'Workshop':text.toLowerCase().includes('info')?'Infoabend':'Community Event';event.eventMode=text.toLowerCase().includes('online')||text.toLowerCase().includes('zoom')?'Online':'Offline';event.registrationLink=window.location.href;if(event.title)events.push(event);});if(events.length>0){var json=JSON.stringify(events,null,2);navigator.clipboard.writeText(json).then(function(){alert('✅ '+events.length+' Events kopiert!\n\nJetzt im Newsletter Builder einfügen.');}).catch(function(){prompt('Events kopieren:',json);});}else{alert('❌ Keine Events gefunden.\n\nStellen Sie sicher, dass Sie auf einer Event-Seite sind.');}})();" 
+                       class="bookmarklet-link" 
+                       onclick="event.preventDefault(); alert('Bitte ziehen Sie diesen Button in Ihre Lesezeichen-Leiste!');">
+                    🎯 SwaF Event Scraper
+                </a>
+                <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                    ⚠️ Hinweis: Der Button muss gezogen werden, nicht geklickt!
+                </p>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <h3>2. Events kopieren</h3>
+                <ol style="margin-left: 20px; line-height: 1.8;">
+                    <li>Öffnen Sie <a href="https://portal.startwithafriend.de/events" target="_blank" style="color: var(--primary-color);">portal.startwithafriend.de/events</a></li>
+                    <li>Klicken Sie auf das Bookmarklet in Ihrer Lesezeichen-Leiste</li>
+                    <li>Die Events werden automatisch in die Zwischenablage kopiert</li>
+                </ol>
+            </div>
+            
+            <div class="paste-events-box">
+                <h3>3. Events einfügen</h3>
+                <p>Fügen Sie die kopierten Events hier ein (Strg+V / Cmd+V):</p>
+                <textarea id="pasteEventsArea" class="paste-events-textarea" placeholder="JSON-Daten hier einfügen..."></textarea>
+                <button class="primary-btn" onclick="templateBuilder.importPastedEvents()">Events importieren</button>
+                <p style="font-size: 12px; color: #666; margin-top: 10px;">
+                    💡 Tipp: Sie können mehrmals hintereinander verschiedene Seiten scrapen und einfügen!
+                </p>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="secondary-btn" id="cancelEventImport">Schließen</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Copy HTML Modal -->
+    <div id="copyHTMLModal" class="modal">
+        <div class="modal-content" style="min-width: 700px;">
+            <div class="modal-header">
+                <h2>HTML für CleverReach</h2>
+            </div>
+            <div class="copy-html-box">
+                <p>Der HTML-Code wurde in die Zwischenablage kopiert! Fügen Sie ihn direkt in CleverReach ein.</p>
+                <div class="html-preview" id="htmlPreview"></div>
+                <button class="primary-btn" onclick="templateBuilder.copyHTMLAgain()">Erneut kopieren</button>
             </div>
             <div class="modal-actions">
-                <button class="secondary-btn" id="cancelEventScraper">Abbrechen</button>
-                <button class="primary-btn" id="runEventScraper">Events importieren</button>
+                <button class="primary-btn" id="closeCopyHTML">Schließen</button>
             </div>
         </div>
     </div>
@@ -758,7 +874,7 @@
                 title: 'Preheader',
                 html: `<div id="CR-PRHEADER" style="display:none;font-size:1px;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;">{{preheaderText}}&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;</div>`,
                 fields: [
-                    { name: 'preheaderText', label: 'Preheader Text', type: 'text', default: 'Wir freuen uns dich zu sehen.' }
+                    { name: 'preheaderText', label: 'Preheader Text (max. 100 Zeichen)', type: 'text', default: 'Wir freuen uns dich zu sehen.' }
                 ]
             },
             'header': {
@@ -797,6 +913,62 @@
                     { name: 'logoUrl', label: 'Logo URL', type: 'text', default: 'https://www.start-with-a-friend.de/wp-content/uploads/2023/05/start-with-a-friend-mobile-logo-1-ai-1.svg' },
                     { name: 'logoLink', label: 'Logo Link', type: 'text', default: 'https://www.start-with-a-friend.de/' },
                     { name: 'onlineVersionText', label: 'Online Version Text', type: 'text', default: 'Im Browser ansehen' }
+                ]
+            },
+            'hero-image': {
+                title: 'Hero Bild',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 0;">
+                                    <img src="{{heroImageUrl}}" alt="{{heroImageAlt}}" style="width: 100%; max-width: 640px; height: auto; display: block;">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'heroImageUrl', label: 'Hero Bild URL', type: 'image', default: 'https://via.placeholder.com/640x360' },
+                    { name: 'heroImageAlt', label: 'Bild Alt-Text', type: 'text', default: 'Hero Image' }
+                ]
+            },
+            'greeting': {
+                title: 'Begrüßung',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 30px;">
+                                    <h2 style="color: #009a93; margin: 0 0 15px 0;">{{greetingTitle}}</h2>
+                                    <p style="color: #333; line-height: 1.6; margin: 0;">{{greetingText}}</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'greetingTitle', label: 'Begrüßung', type: 'text', default: 'Hallo {FIRSTNAME[std:liebe/r Freund/in]}!' },
+                    { name: 'greetingText', label: 'Begrüßungstext', type: 'textarea', default: 'schön, dass du dabei bist! Wir haben wieder spannende Neuigkeiten und Events für dich.' }
+                ]
+            },
+            'text-only': {
+                title: 'Nur Text',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 20px 30px;">
+                                    <h3 style="color: #009a93; margin: 0 0 15px 0;">{{textTitle}}</h3>
+                                    <p style="color: #333; line-height: 1.6;">{{textContent}}</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'textTitle', label: 'Überschrift (optional)', type: 'text', default: '' },
+                    { name: 'textContent', label: 'Text', type: 'textarea', default: 'Ihr Text hier...' }
                 ]
             },
             'image-text': {
@@ -861,6 +1033,84 @@
                     { name: 'rightContent', label: 'Rechter Inhalt', type: 'textarea', default: 'Inhalt der rechten Spalte' }
                 ]
             },
+            'three-columns': {
+                title: 'Drei Spalten',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 20px 30px;">
+                                    <table>
+                                        <tr>
+                                            <td style="width: 31%; vertical-align: top;">
+                                                <h4 style="color: #009a93;">{{col1Title}}</h4>
+                                                <p style="font-size: 14px;">{{col1Content}}</p>
+                                            </td>
+                                            <td style="width: 3.5%;"></td>
+                                            <td style="width: 31%; vertical-align: top;">
+                                                <h4 style="color: #009a93;">{{col2Title}}</h4>
+                                                <p style="font-size: 14px;">{{col2Content}}</p>
+                                            </td>
+                                            <td style="width: 3.5%;"></td>
+                                            <td style="width: 31%; vertical-align: top;">
+                                                <h4 style="color: #009a93;">{{col3Title}}</h4>
+                                                <p style="font-size: 14px;">{{col3Content}}</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'col1Title', label: 'Spalte 1 Titel', type: 'text', default: 'Titel 1' },
+                    { name: 'col1Content', label: 'Spalte 1 Inhalt', type: 'textarea', default: 'Inhalt 1' },
+                    { name: 'col2Title', label: 'Spalte 2 Titel', type: 'text', default: 'Titel 2' },
+                    { name: 'col2Content', label: 'Spalte 2 Inhalt', type: 'textarea', default: 'Inhalt 2' },
+                    { name: 'col3Title', label: 'Spalte 3 Titel', type: 'text', default: 'Titel 3' },
+                    { name: 'col3Content', label: 'Spalte 3 Inhalt', type: 'textarea', default: 'Inhalt 3' }
+                ]
+            },
+            'quote': {
+                title: 'Zitat',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 30px; background-color: #f8f9fa; border-left: 4px solid #009a93;">
+                                    <blockquote style="margin: 0; font-style: italic; color: #555; font-size: 18px; line-height: 1.6;">
+                                        "{{quoteText}}"
+                                    </blockquote>
+                                    <p style="margin-top: 15px; color: #009a93; font-weight: bold;">— {{quoteAuthor}}</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'quoteText', label: 'Zitat', type: 'textarea', default: 'Integration ist keine Einbahnstraße, sondern ein gemeinsamer Weg.' },
+                    { name: 'quoteAuthor', label: 'Autor', type: 'text', default: 'Start with a Friend' }
+                ]
+            },
+            'button-center': {
+                title: 'Button (zentriert)',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 30px; text-align: center;">
+                                    <a href="{{buttonLink}}" style="display: inline-block; padding: 14px 32px; background-color: #009a93; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 16px;">{{buttonText}}</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'buttonText', label: 'Button Text', type: 'text', default: 'Jetzt mitmachen' },
+                    { name: 'buttonLink', label: 'Button Link', type: 'text', default: 'https://www.start-with-a-friend.de/mitmachen/' }
+                ]
+            },
             'cta-section': {
                 title: 'Call-to-Action',
                 html: `
@@ -881,6 +1131,64 @@
                     { name: 'ctaText', label: 'Text', type: 'textarea', default: 'Melde dich jetzt an und werde Teil unserer Community.' },
                     { name: 'ctaButtonText', label: 'Button Text', type: 'text', default: 'Jetzt mitmachen' },
                     { name: 'ctaLink', label: 'Button Link', type: 'text', default: 'https://www.start-with-a-friend.de/mitmachen/' }
+                ]
+            },
+            'social-media': {
+                title: 'Social Media',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 30px; text-align: center; background-color: #f8f9fa;">
+                                    <h3 style="color: #009a93; margin-bottom: 20px;">{{socialTitle}}</h3>
+                                    <table align="center" style="display: inline-table;">
+                                        <tr>
+                                            <td style="padding: 0 10px;">
+                                                <a href="{{facebookLink}}">
+                                                    <img src="https://cdn-icons-png.flaticon.com/512/124/124010.png" alt="Facebook" width="32" height="32">
+                                                </a>
+                                            </td>
+                                            <td style="padding: 0 10px;">
+                                                <a href="{{instagramLink}}">
+                                                    <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram" width="32" height="32">
+                                                </a>
+                                            </td>
+                                            <td style="padding: 0 10px;">
+                                                <a href="{{linkedinLink}}">
+                                                    <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" width="32" height="32">
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'socialTitle', label: 'Überschrift', type: 'text', default: 'Folge uns auf Social Media' },
+                    { name: 'facebookLink', label: 'Facebook Link', type: 'text', default: 'https://www.facebook.com/startwithafriend' },
+                    { name: 'instagramLink', label: 'Instagram Link', type: 'text', default: 'https://www.instagram.com/teamswaf' },
+                    { name: 'linkedinLink', label: 'LinkedIn Link', type: 'text', default: 'https://www.linkedin.com/company/start-with-a-friend' }
+                ]
+            },
+            'divider': {
+                title: 'Trennlinie',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 20px 30px;">
+                                    <hr style="border: none; border-top: {{dividerStyle}} {{dividerWidth}}px {{dividerColor}}; margin: 0;">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'dividerStyle', label: 'Stil', type: 'select', options: ['solid', 'dashed', 'dotted'], default: 'solid' },
+                    { name: 'dividerWidth', label: 'Breite (px)', type: 'number', default: '1' },
+                    { name: 'dividerColor', label: 'Farbe', type: 'text', default: '#e0e0e0' }
                 ]
             },
             'contact-person': {
@@ -990,6 +1298,7 @@
                 this.modules = [];
                 this.moduleCounter = 0;
                 this.currentEditingModule = null;
+                this.currentHTML = '';
                 this.init();
             }
 
@@ -1007,7 +1316,7 @@
                 document.getElementById('exportTemplateBtn').addEventListener('click', () => this.exportJSON());
                 document.getElementById('importTemplateBtn').addEventListener('click', () => this.importJSON());
                 document.getElementById('previewBtn').addEventListener('click', () => this.showPreview());
-                document.getElementById('exportHTMLBtn').addEventListener('click', () => this.exportHTML());
+                document.getElementById('copyHTMLBtn').addEventListener('click', () => this.copyHTML());
                 
                 // Editor actions
                 document.getElementById('clearTemplateBtn').addEventListener('click', () => this.clearTemplate());
@@ -1017,6 +1326,8 @@
                 document.getElementById('cancelModuleEdit').addEventListener('click', () => this.closeModuleEditor());
                 document.getElementById('saveModuleEdit').addEventListener('click', () => this.saveModuleEdit());
                 document.getElementById('closePreview').addEventListener('click', () => this.closePreview());
+                document.getElementById('cancelEventImport').addEventListener('click', () => this.closeEventImport());
+                document.getElementById('closeCopyHTML').addEventListener('click', () => this.closeCopyHTML());
                 
                 // Module editor tabs
                 document.querySelectorAll('.module-editor-tab').forEach(tab => {
@@ -1027,6 +1338,8 @@
                 document.getElementById('overlay').addEventListener('click', () => {
                     this.closeModuleEditor();
                     this.closePreview();
+                    this.closeEventImport();
+                    this.closeCopyHTML();
                 });
                 
                 // Auto-save on changes
@@ -1114,6 +1427,8 @@
                             <span class="module-title">${template.title}</span>
                         </div>
                         <div class="module-actions">
+                            <button class="move-up" onclick="templateBuilder.moveModuleUp('${moduleData.id}')" title="Nach oben">↑</button>
+                            <button class="move-down" onclick="templateBuilder.moveModuleDown('${moduleData.id}')" title="Nach unten">↓</button>
                             <button class="edit-module" onclick="templateBuilder.editModule('${moduleData.id}')">✎ Bearbeiten</button>
                             <button class="duplicate-module" onclick="templateBuilder.duplicateModule('${moduleData.id}')">⎘ Duplizieren</button>
                             <button class="delete-module" onclick="templateBuilder.deleteModule('${moduleData.id}')">✕ Löschen</button>
@@ -1126,6 +1441,40 @@
                 
                 previewContent.appendChild(moduleElement);
                 this.setupModuleDragAndDrop(moduleElement);
+            }
+
+            moveModuleUp(moduleId) {
+                const index = this.modules.findIndex(m => m.id === moduleId);
+                if (index > 0) {
+                    // Swap in array
+                    [this.modules[index], this.modules[index - 1]] = [this.modules[index - 1], this.modules[index]];
+                    
+                    // Swap in DOM
+                    const element = document.getElementById(moduleId);
+                    const prevElement = element.previousElementSibling;
+                    if (prevElement) {
+                        element.parentNode.insertBefore(element, prevElement);
+                    }
+                    
+                    this.autoSave();
+                }
+            }
+
+            moveModuleDown(moduleId) {
+                const index = this.modules.findIndex(m => m.id === moduleId);
+                if (index < this.modules.length - 1) {
+                    // Swap in array
+                    [this.modules[index], this.modules[index + 1]] = [this.modules[index + 1], this.modules[index]];
+                    
+                    // Swap in DOM
+                    const element = document.getElementById(moduleId);
+                    const nextElement = element.nextElementSibling;
+                    if (nextElement) {
+                        element.parentNode.insertBefore(nextElement, element);
+                    }
+                    
+                    this.autoSave();
+                }
             }
 
             renderModuleContent(moduleData) {
@@ -1315,7 +1664,7 @@
                 
                 html += '<div class="field-group">';
                 html += '<label>Events</label>';
-                html += '<button class="primary-btn" onclick="templateBuilder.showEventScraper()">Events importieren</button>';
+                html += '<button class="primary-btn" onclick="templateBuilder.showEventImport()">📥 Events importieren</button>';
                 html += '<div class="dynamic-items-list" style="margin-top: 15px;">';
                 
                 const events = module.fields.events || [];
@@ -1334,7 +1683,84 @@
                 return html;
             }
 
+            showEventImport() {
+                document.getElementById('eventImportModal').style.display = 'block';
+                document.getElementById('overlay').style.display = 'block';
+            }
+
+            closeEventImport() {
+                document.getElementById('eventImportModal').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
+            }
+
+            importPastedEvents() {
+                const textarea = document.getElementById('pasteEventsArea');
+                const jsonText = textarea.value.trim();
+                
+                if (!jsonText) {
+                    this.showNotification('Bitte fügen Sie die kopierten Events ein.', true);
+                    return;
+                }
+                
+                try {
+                    const events = JSON.parse(jsonText);
+                    
+                    if (!Array.isArray(events)) {
+                        throw new Error('Die Daten sind kein gültiges Event-Array');
+                    }
+                    
+                    if (events.length === 0) {
+                        this.showNotification('Keine Events in den Daten gefunden', true);
+                        return;
+                    }
+                    
+                    // Add events to current module
+                    if (this.currentEditingModule) {
+                        if (!this.currentEditingModule.fields.events) {
+                            this.currentEditingModule.fields.events = [];
+                        }
+                        
+                        // Process events for CleverReach personalization
+                        events.forEach(event => {
+                            if (event.title) {
+                                event.title = event.title.replace(/\{NAME\}/g, '{FIRSTNAME[std:Hi]}');
+                            }
+                            if (event.description) {
+                                event.description = event.description.replace(/\{NAME\}/g, '{FIRSTNAME[std:Hi]}');
+                            }
+                        });
+                        
+                        // Ask if existing events should be kept
+                        if (this.currentEditingModule.fields.events.length > 0) {
+                            if (confirm(`Es sind bereits ${this.currentEditingModule.fields.events.length} Events vorhanden. Möchten Sie die neuen Events hinzufügen (OK) oder ersetzen (Abbrechen)?`)) {
+                                this.currentEditingModule.fields.events.push(...events);
+                            } else {
+                                this.currentEditingModule.fields.events = events;
+                            }
+                        } else {
+                            this.currentEditingModule.fields.events = events;
+                        }
+                        
+                        // Clear textarea
+                        textarea.value = '';
+                        
+                        // Refresh editor
+                        this.editModule(this.currentEditingModule.id);
+                        
+                        this.showNotification(`${events.length} Events erfolgreich importiert!`, false, 'success');
+                    }
+                    
+                } catch (error) {
+                    console.error('Fehler beim Parsen der Events:', error);
+                    this.showNotification('Fehler: Die eingefügten Daten sind nicht im richtigen Format', true);
+                }
+            }
+
             buildEventCard(event, index) {
+                // CleverReach Personalisierung
+                const personalizedTitle = event.title ? event.title.replace(/\{NAME\}/g, '{FIRSTNAME[std:Hi]}') : event.title;
+                const personalizedDescription = event.description ? event.description.replace(/\{NAME\}/g, '{FIRSTNAME[std:Hi]}') : event.description;
+                
                 return `
                     <div class="event-card" data-index="${index}">
                         <div class="event-card-header">
@@ -1344,11 +1770,15 @@
                                     <div class="event-date-day">${event.day || '?'}</div>
                                 </div>
                                 <div style="flex: 1;">
-                                    <input type="text" value="${event.title}" onchange="templateBuilder.updateEvent(${index}, 'title', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Event Titel">
+                                    <input type="text" value="${personalizedTitle}" onchange="templateBuilder.updateEvent(${index}, 'title', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Event Titel">
+                                    <input type="date" value="${event.date || ''}" onchange="templateBuilder.updateEvent(${index}, 'date', this.value)" style="width: 100%; margin-bottom: 5px;">
                                     <input type="text" value="${event.time}" onchange="templateBuilder.updateEvent(${index}, 'time', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Uhrzeit">
                                     <input type="text" value="${event.location}" onchange="templateBuilder.updateEvent(${index}, 'location', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Ort">
-                                    <textarea onchange="templateBuilder.updateEvent(${index}, 'description', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Beschreibung">${event.description}</textarea>
+                                    <textarea onchange="templateBuilder.updateEvent(${index}, 'description', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Beschreibung">${personalizedDescription}</textarea>
                                     <input type="text" value="${event.registrationLink || ''}" onchange="templateBuilder.updateEvent(${index}, 'registrationLink', this.value)" style="width: 100%;" placeholder="Anmelde-Link (optional)">
+                                    <div style="margin-top: 5px; font-size: 11px; color: #666;">
+                                        Tipp: Verwenden Sie {FIRSTNAME[std:Hi]} für personalisierte Anrede in CleverReach
+                                    </div>
                                 </div>
                             </div>
                             <div class="event-badges">
@@ -1377,6 +1807,16 @@
                         if (value) {
                             html += `<div class="image-preview"><img src="${value}" alt="Vorschau"></div>`;
                         }
+                        break;
+                    case 'select':
+                        html += `<select id="${field.name}" name="${field.name}">`;
+                        field.options.forEach(option => {
+                            html += `<option value="${option}" ${(value || field.default) === option ? 'selected' : ''}>${option}</option>`;
+                        });
+                        html += '</select>';
+                        break;
+                    case 'number':
+                        html += `<input type="number" id="${field.name}" name="${field.name}" value="${value || field.default}">`;
                         break;
                     default:
                         html += `<input type="text" id="${field.name}" name="${field.name}" value="${value || field.default}">`;
@@ -1424,62 +1864,6 @@
                 input.click();
             }
 
-            showEventScraper() {
-                document.getElementById('eventScraperModal').style.display = 'block';
-                document.getElementById('overlay').style.display = 'block';
-                
-                // Setup scraper buttons
-                document.getElementById('cancelEventScraper').onclick = () => {
-                    document.getElementById('eventScraperModal').style.display = 'none';
-                    document.getElementById('overlay').style.display = 'none';
-                };
-                
-                document.getElementById('runEventScraper').onclick = () => {
-                    this.importEvents();
-                };
-            }
-
-            importEvents() {
-                // Simulate event import
-                const sampleEvents = [
-                    {
-                        title: 'Community Event Berlin',
-                        month: 'Jan',
-                        day: '15',
-                        time: '18:00 - 20:00 Uhr',
-                        location: 'Berlin, Alexanderplatz',
-                        description: 'Komm zu unserem monatlichen Community-Treffen!',
-                        category: 'Community Event',
-                        eventMode: 'Offline',
-                        registrationLink: 'https://www.start-with-a-friend.de/events'
-                    },
-                    {
-                        title: 'Online Info-Abend',
-                        month: 'Jan',
-                        day: '22',
-                        time: '19:00 - 20:30 Uhr',
-                        location: 'Online via Zoom',
-                        description: 'Erfahre mehr über Start with a Friend und wie du mitmachen kannst.',
-                        category: 'Infoabend',
-                        eventMode: 'Online',
-                        registrationLink: 'https://www.start-with-a-friend.de/events'
-                    }
-                ];
-                
-                if (this.currentEditingModule) {
-                    if (!this.currentEditingModule.fields.events) {
-                        this.currentEditingModule.fields.events = [];
-                    }
-                    this.currentEditingModule.fields.events.push(...sampleEvents);
-                    
-                    // Refresh editor
-                    this.editModule(this.currentEditingModule.id);
-                }
-                
-                document.getElementById('eventScraperModal').style.display = 'none';
-                this.showNotification('Events importiert');
-            }
-
             addManualEvent() {
                 if (!this.currentEditingModule) return;
                 
@@ -1519,6 +1903,15 @@
                         const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
                         this.currentEditingModule.fields.events[index].month = months[date.getMonth()];
                         this.currentEditingModule.fields.events[index].day = date.getDate().toString();
+                        
+                        // Update the display immediately
+                        const eventCard = document.querySelector(`.event-card[data-index="${index}"]`);
+                        if (eventCard) {
+                            const monthElement = eventCard.querySelector('.event-date-month');
+                            const dayElement = eventCard.querySelector('.event-date-day');
+                            if (monthElement) monthElement.textContent = months[date.getMonth()];
+                            if (dayElement) dayElement.textContent = date.getDate().toString();
+                        }
                     }
                 }
             }
@@ -1593,6 +1986,8 @@
                 newElement.querySelector('.edit-module').setAttribute('onclick', `templateBuilder.editModule('${newModule.id}')`);
                 newElement.querySelector('.duplicate-module').setAttribute('onclick', `templateBuilder.duplicateModule('${newModule.id}')`);
                 newElement.querySelector('.delete-module').setAttribute('onclick', `templateBuilder.deleteModule('${newModule.id}')`);
+                newElement.querySelector('.move-up').setAttribute('onclick', `templateBuilder.moveModuleUp('${newModule.id}')`);
+                newElement.querySelector('.move-down').setAttribute('onclick', `templateBuilder.moveModuleDown('${newModule.id}')`);
                 
                 moduleElement.parentNode.insertBefore(newElement, moduleElement.nextSibling);
                 this.setupModuleDragAndDrop(newElement);
@@ -1774,8 +2169,40 @@
                 this.showNotification('HTML generiert und heruntergeladen');
             }
 
-            exportHTML() {
-                this.generateHTML();
+            copyHTML() {
+                const html = this.buildCompleteHTML();
+                this.currentHTML = html;
+                
+                // Copy to clipboard
+                navigator.clipboard.writeText(html).then(() => {
+                    // Show modal with preview
+                    document.getElementById('htmlPreview').textContent = html;
+                    document.getElementById('copyHTMLModal').style.display = 'block';
+                    document.getElementById('overlay').style.display = 'block';
+                    
+                    this.showNotification('HTML in Zwischenablage kopiert!', false, 'success');
+                }).catch(err => {
+                    console.error('Fehler beim Kopieren:', err);
+                    // Fallback: Show in modal for manual copy
+                    document.getElementById('htmlPreview').textContent = html;
+                    document.getElementById('copyHTMLModal').style.display = 'block';
+                    document.getElementById('overlay').style.display = 'block';
+                    
+                    this.showNotification('Bitte kopieren Sie den HTML-Code manuell', true);
+                });
+            }
+
+            copyHTMLAgain() {
+                navigator.clipboard.writeText(this.currentHTML).then(() => {
+                    this.showNotification('HTML erneut kopiert!', false, 'success');
+                }).catch(err => {
+                    this.showNotification('Bitte markieren und kopieren Sie den Code manuell', true);
+                });
+            }
+
+            closeCopyHTML() {
+                document.getElementById('copyHTMLModal').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
             }
 
             buildCompleteHTML() {
@@ -1853,9 +2280,16 @@
                 }
             }
 
-            showNotification(message, isError = false) {
+            showNotification(message, isError = false, type = null) {
                 const notification = document.createElement('div');
-                notification.className = 'notification' + (isError ? ' error' : '');
+                notification.className = 'notification';
+                
+                if (isError) {
+                    notification.className += ' error';
+                } else if (type === 'success') {
+                    notification.className += ' success';
+                }
+                
                 notification.textContent = message;
                 
                 document.body.appendChild(notification);
