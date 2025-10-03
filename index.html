@@ -471,12 +471,27 @@
         .bookmarklet-link {
             display: inline-block;
             background: var(--primary-color);
-            color: white;
-            padding: 10px 20px;
+            color: white !important;
+            padding: 15px 30px;
             border-radius: 6px;
             text-decoration: none;
             font-weight: bold;
+            font-size: 16px;
             margin: 10px 0;
+            cursor: move;
+            box-shadow: 0 4px 12px rgba(0, 153, 147, 0.3);
+            transition: all 0.3s;
+            border: 3px solid var(--primary-color);
+        }
+
+        .bookmarklet-link:hover {
+            background: #007a73;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 153, 147, 0.4);
+        }
+
+        .bookmarklet-link:active {
+            transform: scale(0.98);
         }
 
         .bookmarklet-link:hover {
@@ -657,6 +672,7 @@
                 <div class="header-button-separator"></div>
                 <button id="previewBtn" title="Vorschau">Vorschau</button>
                 <button id="copyHTMLBtn" title="HTML kopieren">📋 HTML kopieren</button>
+                <button id="helpBtn" title="Hilfe & Anleitung" style="background: #0066cc;">❓ Hilfe</button>
             </div>
         </header>
 
@@ -723,6 +739,10 @@
                     <div class="module" draggable="true" data-module-type="button-center">
                         <span class="module-drag-handle"></span>
                         <span class="module-title">Button (zentriert)</span>
+                    </div>
+                    <div class="module" draggable="true" data-module-type="three-buttons">
+                        <span class="module-drag-handle"></span>
+                        <span class="module-title">Drei Buttons</span>
                     </div>
                     <div class="module" draggable="true" data-module-type="social-media">
                         <span class="module-drag-handle"></span>
@@ -795,36 +815,63 @@
                 <h2>Events importieren</h2>
             </div>
             
-            <div class="bookmarklet-box">
-                <h3>1. Bookmarklet installieren</h3>
-                <p>Ziehen Sie diesen Button in Ihre Lesezeichen-Leiste:</p>
-                <a href="javascript:(function(){var events=[];document.querySelectorAll('[class*=&quot;event&quot;],[class*=&quot;Event&quot;],article,.card,.list-item').forEach(function(el){var event={};var dateMatch=(el.textContent||'').match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/);if(dateMatch){var date=new Date(parseInt(dateMatch[3])<100?2000+parseInt(dateMatch[3]):dateMatch[3],dateMatch[2]-1,dateMatch[1]);var months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];event.month=months[date.getMonth()];event.day=date.getDate().toString();event.date=date.toISOString().split('T')[0];}var title=el.querySelector('h1,h2,h3,h4,h5,[class*=&quot;title&quot;]');event.title=title?title.textContent.trim():'Event';var timeMatch=(el.textContent||'').match(/(\d{1,2}):(\d{2})(\s*-\s*\d{1,2}:\d{2})?(\s*Uhr)?/i);event.time=timeMatch?timeMatch[0]:'';var text=el.textContent||'';['Berlin','Hamburg','München','Köln','Frankfurt','Stuttgart','Dresden','Leipzig','Online','Zoom'].forEach(function(loc){if(text.includes(loc))event.location=event.location||loc;});event.location=event.location||'';var desc=el.querySelector('p,[class*=&quot;description&quot;]');event.description=desc?desc.textContent.trim().substring(0,200):'';event.category=text.toLowerCase().includes('workshop')?'Workshop':text.toLowerCase().includes('info')?'Infoabend':'Community Event';event.eventMode=text.toLowerCase().includes('online')||text.toLowerCase().includes('zoom')?'Online':'Offline';event.registrationLink=window.location.href;if(event.title)events.push(event);});if(events.length>0){var json=JSON.stringify(events,null,2);navigator.clipboard.writeText(json).then(function(){alert('✅ '+events.length+' Events kopiert!\n\nJetzt im Newsletter Builder einfügen.');}).catch(function(){prompt('Events kopieren:',json);});}else{alert('❌ Keine Events gefunden.\n\nStellen Sie sicher, dass Sie auf einer Event-Seite sind.');}})();" 
-                       class="bookmarklet-link" 
-                       onclick="event.preventDefault(); alert('Bitte ziehen Sie diesen Button in Ihre Lesezeichen-Leiste!');">
-                    🎯 SwaF Event Scraper
-                </a>
-                <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                    ⚠️ Hinweis: Der Button muss gezogen werden, nicht geklickt!
-                </p>
-            </div>
-            
-            <div style="margin: 20px 0;">
-                <h3>2. Events kopieren</h3>
-                <ol style="margin-left: 20px; line-height: 1.8;">
-                    <li>Öffnen Sie <a href="https://portal.startwithafriend.de/events" target="_blank" style="color: var(--primary-color);">portal.startwithafriend.de/events</a></li>
-                    <li>Klicken Sie auf das Bookmarklet in Ihrer Lesezeichen-Leiste</li>
-                    <li>Die Events werden automatisch in die Zwischenablage kopiert</li>
-                </ol>
-            </div>
-            
-            <div class="paste-events-box">
-                <h3>3. Events einfügen</h3>
-                <p>Fügen Sie die kopierten Events hier ein (Strg+V / Cmd+V):</p>
-                <textarea id="pasteEventsArea" class="paste-events-textarea" placeholder="JSON-Daten hier einfügen..."></textarea>
-                <button class="primary-btn" onclick="templateBuilder.importPastedEvents()">Events importieren</button>
-                <p style="font-size: 12px; color: #666; margin-top: 10px;">
-                    💡 Tipp: Sie können mehrmals hintereinander verschiedene Seiten scrapen und einfügen!
-                </p>
+            <div class="bookmarklet-box" style="background: #f8f9fa; border: 2px dashed var(--primary-color); border-radius: 8px; padding: 20px; margin-bottom: 20px;">
+                <h3 style="color: var(--primary-color); margin: 0 0 20px 0;">📚 Schritt-für-Schritt Anleitung</h3>
+                
+                <!-- Schritt 1: Code kopieren -->
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--primary-color);">
+                    <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 16px;">
+                        1️⃣ Bookmarklet-Code kopieren
+                    </p>
+                    
+                    <button class="primary-btn" id="copyBookmarkletBtn" style="font-size: 16px; margin-bottom: 10px;">
+                        📋 Code in Zwischenablage kopieren
+                    </button>
+                    
+                    <div id="copySuccess" style="display: none; background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-top: 10px;">
+                        <p style="margin: 0; color: #155724; font-weight: bold;">✅ Code kopiert!</p>
+                    </div>
+                </div>
+                
+                <!-- Schritt 2: Lesezeichen erstellen -->
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--secondary-color);">
+                    <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 16px;">
+                        2️⃣ Lesezeichen erstellen
+                    </p>
+                    <ol style="margin: 0; padding-left: 20px; line-height: 1.8; font-size: 14px; color: #555;">
+                        <li>Drücke <kbd style="background: #e0e0e0; padding: 2px 6px; border-radius: 3px; font-family: monospace;">Strg+D</kbd> (Windows) oder <kbd style="background: #e0e0e0; padding: 2px 6px; border-radius: 3px; font-family: monospace;">Cmd+D</kbd> (Mac)</li>
+                        <li>Name: <code style="background: #e0e0e0; padding: 2px 8px; border-radius: 3px;">SwaF Events</code></li>
+                        <li><strong>Lösche die URL komplett</strong> und füge den kopierten Code ein (<kbd style="background: #e0e0e0; padding: 2px 6px; border-radius: 3px; font-family: monospace;">Strg+V</kbd>)</li>
+                        <li>Speichere das Lesezeichen</li>
+                    </ol>
+                </div>
+                
+                <!-- Schritt 3: Events scrapen -->
+                <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #ffc107;">
+                    <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 16px;">
+                        3️⃣ Events scrapen
+                    </p>
+                    <ol style="margin: 0; padding-left: 20px; line-height: 1.8; font-size: 14px; color: #555;">
+                        <li>Öffne <a href="https://portal.startwithafriend.de/events" target="_blank" style="color: var(--primary-color); font-weight: bold;">portal.startwithafriend.de/events</a> in einem neuen Tab</li>
+                        <li><strong>Warte, bis alle Events sichtbar sind</strong></li>
+                        <li>Klicke auf dein <strong>"SwaF Events"</strong> Lesezeichen</li>
+                        <li>Die Events werden automatisch kopiert</li>
+                    </ol>
+                </div>
+                
+                <!-- Schritt 4: Einfügen -->
+                <div style="background: white; padding: 20px; border-radius: 8px; border-left: 4px solid var(--accent-color);">
+                    <p style="margin: 0 0 15px 0; font-weight: bold; font-size: 16px;">
+                        4️⃣ Events hier einfügen
+                    </p>
+                    <textarea id="pasteEventsArea" class="paste-events-textarea" placeholder='Nach dem Scraping: Strg+V / Cmd+V zum Einfügen...'></textarea>
+                    <button class="primary-btn" onclick="templateBuilder.importPastedEvents()" style="margin-top: 10px;">
+                        ✨ Events importieren
+                    </button>
+                    <p style="font-size: 12px; color: #666; margin: 10px 0 0 0;">
+                        💡 Tipp: Du kannst mehrere Seiten nacheinander scrapen und hier einfügen!
+                    </p>
+                </div>
             </div>
             
             <div class="modal-actions">
@@ -832,6 +879,161 @@
             </div>
         </div>
     </div>
+
+    <script>
+    document.getElementById('copyBookmarkletBtn').addEventListener('click', function() {
+        // Verbesserter Scraper mit Datum-Extraktion, Sortierung und Debugging
+        var code = "javascript:(function(){console.log('🎯 SwaF Scraper v7 - Verbessert');var e=[];var c=document.querySelectorAll('div.col-md-6,div.col-lg-4,div[class*=\"col\"]');console.log('Container gefunden:',c.length);for(var i=0;i<c.length;i++){var d=c[i];var l=d.querySelector('a[href*=\"event\"]');if(!l){console.log('Kein Event-Link in Container',i);continue;}var t=d.textContent||d.innerText||'';var lines=t.split('\\n').map(function(x){return x.trim();}).filter(function(x){return x.length>0;});console.log('Container',i,'Zeilen:',lines);if(lines.length<2)continue;var v={};var months=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];var foundDate=false;for(var j=0;j<Math.min(5,lines.length);j++){var line=lines[j];console.log('Prüfe Zeile',j,':',line);if(months.indexOf(line)>-1&&j<lines.length-1){var nextLine=lines[j+1];if(nextLine.match(/^\\d{1,2}$/)){v.month=line;v.day=nextLine;foundDate=true;console.log('Datum gefunden:',line,nextLine);break;}}var combined=line.split(/\\s+/);if(combined.length>=2&&months.indexOf(combined[0])>-1&&combined[1].match(/^\\d{1,2}$/)){v.month=combined[0];v.day=combined[1];foundDate=true;console.log('Datum in einer Zeile:',combined[0],combined[1]);break;}}if(foundDate){var y=new Date().getFullYear();var mi=months.indexOf(v.month);var dayNum=parseInt(v.day);var dt=new Date(y,mi,dayNum);if(dt<new Date()){dt.setFullYear(y+1);}v.date=dt.getFullYear()+'-'+(dt.getMonth()+1<10?'0':'')+(dt.getMonth()+1)+'-'+(dt.getDate()<10?'0':'')+dt.getDate();v.sortDate=dt.getTime();}else{v.month='TBD';v.day='?';v.date='';v.sortDate=999999999999999;console.log('Kein Datum gefunden');}var titleFound=false;for(var k=0;k<lines.length;k++){var w=lines[k];if(w.length>5&&w.indexOf('Anmeldung')===-1&&w.indexOf('möglich')===-1&&w.indexOf('geschlossen')===-1&&months.indexOf(w)===-1&&!w.match(/^\\d{1,2}$/)&&!titleFound){v.title=w.replace(/🤝|✨|🎉|💜|☕|️💬|🎤/g,'').trim();titleFound=true;console.log('Titel:',v.title);break;}}if(!v.title||v.title.length<3){console.log('Kein Titel, überspringe');continue;}var cities=['Berlin','Hamburg','München','Köln','Frankfurt','Stuttgart','Dresden','Leipzig','Chemnitz','Freiburg','Düsseldorf','Mannheim','Hannover','Bundesweit'];v.location='';for(var ci=0;ci<cities.length;ci++){if(t.indexOf(cities[ci])>-1){v.location=cities[ci]==='Bundesweit'?'Online':cities[ci];break;}}var cats=['Infoabend','Workshop','Qualifizierung','Communityevent'];v.category='Community Event';for(var ca=0;ca<cats.length;ca++){if(t.indexOf(cats[ca])>-1){v.category=cats[ca]==='Communityevent'?'Community Event':cats[ca];break;}}v.eventMode=t.indexOf('Online')>-1?'Online':'Offline';var tm=t.match(/(\\d{1,2}):(\\d{2})/);v.time=tm?tm[0]+' Uhr':'';v.registrationLink=l.href;v.description='';v.highlight=false;e.push(v);console.log('✅ Event hinzugefügt:',v.title);}e.sort(function(a,b){return a.sortDate-b.sortDate;});var clean=[];for(var n=0;n<e.length;n++){var dup=false;for(var o=0;o<clean.length;o++){if(clean[o].title===e[n].title&&clean[o].date===e[n].date){dup=true;break;}}if(!dup){delete e[n].sortDate;clean.push(e[n]);}}console.log('✅ '+clean.length+' Events sortiert');if(clean.length>0){var json=JSON.stringify(clean,null,2);navigator.clipboard.writeText(json).then(function(){alert('✅ '+clean.length+' Events kopiert!\\n\\nChronologisch sortiert.\\nJetzt einfügen (Strg+V).')}).catch(function(){prompt('Events:',json)})}else{alert('⚠️ Keine Events gefunden.\\nKonsole öffnen (F12) für Details.')}})();";
+        
+        navigator.clipboard.writeText(code).then(function() {
+            var btn = document.getElementById('copyBookmarkletBtn');
+            var success = document.getElementById('copySuccess');
+            
+            btn.textContent = '✅ Kopiert!';
+            btn.style.backgroundColor = '#28a745';
+            success.style.display = 'block';
+            
+            setTimeout(function() {
+                btn.textContent = '📋 Code in Zwischenablage kopieren';
+                btn.style.backgroundColor = '';
+            }, 3000);
+        }).catch(function(err) {
+            alert('Fehler beim Kopieren. Bitte F12 öffnen und Screenshot senden.');
+            console.error('Copy error:', err);
+        });
+    });
+    </script>
+
+    <script>
+    function installBookmarklet() {
+        // Der Scraper-Code - sauber und ohne Escape-Probleme
+        const scraperCode = `javascript:(function(){
+            console.log('🎯 SwaF Event Scraper v6');
+            var events = [];
+            
+            // Suche Event-Container
+            var cards = document.querySelectorAll('div.col-md-6.col-lg-4.mb-4, div.col-md-6, div.col-lg-4');
+            console.log('Cards gefunden:', cards.length);
+            
+            for (var i = 0; i < cards.length; i++) {
+                var card = cards[i];
+                var link = card.querySelector('a');
+                if (!link) continue;
+                
+                var text = link.textContent || '';
+                var lines = text.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
+                
+                if (lines.length < 3) continue;
+                
+                var event = {};
+                
+                // Datum extrahieren
+                var months = ['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+                for (var j = 0; j < Math.min(3, lines.length); j++) {
+                    var parts = lines[j].split(' ');
+                    if (parts.length === 2 && months.indexOf(parts[0]) > -1) {
+                        event.month = parts[0];
+                        event.day = parts[1];
+                        
+                        var monthIdx = months.indexOf(parts[0]);
+                        var year = new Date().getFullYear();
+                        var d = new Date(year, monthIdx, parseInt(parts[1]));
+                        if (d < new Date()) d.setFullYear(year + 1);
+                        
+                        var m = d.getMonth() + 1;
+                        var day = d.getDate();
+                        event.date = d.getFullYear() + '-' + (m < 10 ? '0' : '') + m + '-' + (day < 10 ? '0' : '') + day;
+                        break;
+                    }
+                }
+                
+                if (!event.date) {
+                    event.month = 'TBD';
+                    event.day = '?';
+                    event.date = '';
+                }
+                
+                // Titel finden
+                for (var k = 0; k < lines.length; k++) {
+                    var line = lines[k];
+                    if (line.length > 5 && 
+                        line.indexOf('Anmeldung') === -1 && 
+                        line.indexOf('möglich') === -1 && 
+                        !line.match(/^(Jan|Feb|Mär|Apr|Mai|Jun|Jul|Aug|Sep|Okt|Nov|Dez)/) &&
+                        !event.title) {
+                        event.title = line.replace(/🤝|✨|🎉/g, '').trim();
+                        break;
+                    }
+                }
+                
+                if (!event.title) continue;
+                
+                // Ort
+                var locs = ['Berlin','Hamburg','München','Köln','Frankfurt','Stuttgart','Dresden','Leipzig','Chemnitz','Freiburg','Düsseldorf','Mannheim','Hannover','Bundesweit'];
+                event.location = '';
+                for (var l = 0; l < locs.length; l++) {
+                    if (text.indexOf(locs[l]) > -1) {
+                        event.location = locs[l] === 'Bundesweit' ? 'Online' : locs[l];
+                        break;
+                    }
+                }
+                
+                // Kategorie
+                if (text.indexOf('Infoabend') > -1) event.category = 'Infoabend';
+                else if (text.indexOf('Workshop') > -1 || text.indexOf('Qualifizierung') > -1) event.category = 'Workshop';
+                else event.category = 'Community Event';
+                
+                // Modus
+                event.eventMode = text.indexOf('Online') > -1 ? 'Online' : 'Offline';
+                
+                // Zeit
+                var timeMatch = text.match(/(\\d{1,2}):(\\d{2})/);
+                event.time = timeMatch ? timeMatch[0] + ' Uhr' : '';
+                
+                // Link & Beschreibung
+                event.registrationLink = link.href;
+                event.description = '';
+                
+                events.push(event);
+            }
+            
+            // Duplikate entfernen
+            var clean = [];
+            for (var n = 0; n < events.length; n++) {
+                var isDup = false;
+                for (var o = 0; o < clean.length; o++) {
+                    if (clean[o].title === events[n].title && clean[o].date === events[n].date) {
+                        isDup = true;
+                        break;
+                    }
+                }
+                if (!isDup && events[n].title && events[n].title.length > 3) {
+                    clean.push(events[n]);
+                }
+            }
+            
+            console.log('Events extrahiert:', clean.length);
+            
+            if (clean.length > 0) {
+                var json = JSON.stringify(clean, null, 2);
+                navigator.clipboard.writeText(json).then(function() {
+                    alert('✅ ' + clean.length + ' Events kopiert!\\n\\nJetzt im Newsletter Builder einfügen.');
+                }).catch(function() {
+                    prompt('Events kopieren:', json);
+                });
+            } else {
+                alert('⚠️ Keine Events gefunden.\\nF12 drücken für Details.');
+            }
+        })();`;
+        
+        // Code in Zwischenablage kopieren
+        navigator.clipboard.writeText(scraperCode).then(function() {
+            document.getElementById('installInstructions').style.display = 'block';
+        }).catch(function(err) {
+            prompt('Bitte kopiere diesen Code manuell:', scraperCode);
+        });
+    }
+    </script>
 
     <!-- Copy HTML Modal -->
     <div id="copyHTMLModal" class="modal">
@@ -895,15 +1097,6 @@
                                             </tr>
                                         </tbody>
                                     </table>
-                                    <table align="right">
-                                        <tbody>
-                                            <tr>
-                                                <td align="right" style="padding-top:20px;padding-bottom: 0px;">
-                                                    <a href="https://newsletter.start-with-a-friend.de/m/[MAILING_ID]/[HASH]" style="color: #009a93; text-decoration: none;">{{onlineVersionText}}</a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
                                 </td>
                             </tr>
                         </tbody>
@@ -912,7 +1105,6 @@
                 fields: [
                     { name: 'logoUrl', label: 'Logo URL', type: 'text', default: 'https://www.start-with-a-friend.de/wp-content/uploads/2023/05/start-with-a-friend-mobile-logo-1-ai-1.svg' },
                     { name: 'logoLink', label: 'Logo Link', type: 'text', default: 'https://www.start-with-a-friend.de/' },
-                    { name: 'onlineVersionText', label: 'Online Version Text', type: 'text', default: 'Im Browser ansehen' }
                 ]
             },
             'hero-image': {
@@ -1008,16 +1200,18 @@
                         <tbody>
                             <tr>
                                 <td style="padding: 20px 30px;">
-                                    <table>
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                         <tr>
-                                            <td style="width: 48%; vertical-align: top;">
-                                                <h3 style="color: #009a93;">{{leftTitle}}</h3>
-                                                <p>{{leftContent}}</p>
+                                            <td width="48%" valign="top">
+                                                <h3 style="color: #009a93; margin: 0 0 10px 0;">{{leftTitle}}</h3>
+                                                <p style="margin: 0 0 15px 0; line-height: 1.6;">{{leftContent}}</p>
+                                                <a href="{{leftButtonLink}}" style="display: inline-block; background: #009a93; color: white; padding: 10px 20px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 14px;">{{leftButtonText}}</a>
                                             </td>
-                                            <td style="width: 4%;"></td>
-                                            <td style="width: 48%; vertical-align: top;">
-                                                <h3 style="color: #009a93;">{{rightTitle}}</h3>
-                                                <p>{{rightContent}}</p>
+                                            <td width="4%"></td>
+                                            <td width="48%" valign="top">
+                                                <h3 style="color: #009a93; margin: 0 0 10px 0;">{{rightTitle}}</h3>
+                                                <p style="margin: 0 0 15px 0; line-height: 1.6;">{{rightContent}}</p>
+                                                <a href="{{rightButtonLink}}" style="display: inline-block; background: #009a93; color: white; padding: 10px 20px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 14px;">{{rightButtonText}}</a>
                                             </td>
                                         </tr>
                                     </table>
@@ -1029,8 +1223,12 @@
                 fields: [
                     { name: 'leftTitle', label: 'Linke Überschrift', type: 'text', default: 'Überschrift Links' },
                     { name: 'leftContent', label: 'Linker Inhalt', type: 'textarea', default: 'Inhalt der linken Spalte' },
+                    { name: 'leftButtonText', label: 'Linker Button Text', type: 'text', default: 'Mehr erfahren' },
+                    { name: 'leftButtonLink', label: 'Linker Button Link', type: 'text', default: 'https://www.start-with-a-friend.de/' },
                     { name: 'rightTitle', label: 'Rechte Überschrift', type: 'text', default: 'Überschrift Rechts' },
-                    { name: 'rightContent', label: 'Rechter Inhalt', type: 'textarea', default: 'Inhalt der rechten Spalte' }
+                    { name: 'rightContent', label: 'Rechter Inhalt', type: 'textarea', default: 'Inhalt der rechten Spalte' },
+                    { name: 'rightButtonText', label: 'Rechter Button Text', type: 'text', default: 'Mehr erfahren' },
+                    { name: 'rightButtonLink', label: 'Rechter Button Link', type: 'text', default: 'https://www.start-with-a-friend.de/' }
                 ]
             },
             'three-columns': {
@@ -1040,21 +1238,24 @@
                         <tbody>
                             <tr>
                                 <td style="padding: 20px 30px;">
-                                    <table>
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
                                         <tr>
-                                            <td style="width: 31%; vertical-align: top;">
-                                                <h4 style="color: #009a93;">{{col1Title}}</h4>
-                                                <p style="font-size: 14px;">{{col1Content}}</p>
+                                            <td width="31%" valign="top">
+                                                <h4 style="color: #009a93; margin: 0 0 10px 0; font-size: 16px;">{{col1Title}}</h4>
+                                                <p style="font-size: 14px; margin: 0 0 12px 0; line-height: 1.5;">{{col1Content}}</p>
+                                                <a href="{{col1ButtonLink}}" style="display: inline-block; background: #009a93; color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 13px;">{{col1ButtonText}}</a>
                                             </td>
-                                            <td style="width: 3.5%;"></td>
-                                            <td style="width: 31%; vertical-align: top;">
-                                                <h4 style="color: #009a93;">{{col2Title}}</h4>
-                                                <p style="font-size: 14px;">{{col2Content}}</p>
+                                            <td width="3.5%"></td>
+                                            <td width="31%" valign="top">
+                                                <h4 style="color: #009a93; margin: 0 0 10px 0; font-size: 16px;">{{col2Title}}</h4>
+                                                <p style="font-size: 14px; margin: 0 0 12px 0; line-height: 1.5;">{{col2Content}}</p>
+                                                <a href="{{col2ButtonLink}}" style="display: inline-block; background: #009a93; color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 13px;">{{col2ButtonText}}</a>
                                             </td>
-                                            <td style="width: 3.5%;"></td>
-                                            <td style="width: 31%; vertical-align: top;">
-                                                <h4 style="color: #009a93;">{{col3Title}}</h4>
-                                                <p style="font-size: 14px;">{{col3Content}}</p>
+                                            <td width="3.5%"></td>
+                                            <td width="31%" valign="top">
+                                                <h4 style="color: #009a93; margin: 0 0 10px 0; font-size: 16px;">{{col3Title}}</h4>
+                                                <p style="font-size: 14px; margin: 0 0 12px 0; line-height: 1.5;">{{col3Content}}</p>
+                                                <a href="{{col3ButtonLink}}" style="display: inline-block; background: #009a93; color: white; padding: 8px 16px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 13px;">{{col3ButtonText}}</a>
                                             </td>
                                         </tr>
                                     </table>
@@ -1066,10 +1267,16 @@
                 fields: [
                     { name: 'col1Title', label: 'Spalte 1 Titel', type: 'text', default: 'Titel 1' },
                     { name: 'col1Content', label: 'Spalte 1 Inhalt', type: 'textarea', default: 'Inhalt 1' },
+                    { name: 'col1ButtonText', label: 'Spalte 1 Button', type: 'text', default: 'Mehr' },
+                    { name: 'col1ButtonLink', label: 'Spalte 1 Link', type: 'text', default: 'https://www.start-with-a-friend.de/' },
                     { name: 'col2Title', label: 'Spalte 2 Titel', type: 'text', default: 'Titel 2' },
                     { name: 'col2Content', label: 'Spalte 2 Inhalt', type: 'textarea', default: 'Inhalt 2' },
+                    { name: 'col2ButtonText', label: 'Spalte 2 Button', type: 'text', default: 'Mehr' },
+                    { name: 'col2ButtonLink', label: 'Spalte 2 Link', type: 'text', default: 'https://www.start-with-a-friend.de/' },
                     { name: 'col3Title', label: 'Spalte 3 Titel', type: 'text', default: 'Titel 3' },
-                    { name: 'col3Content', label: 'Spalte 3 Inhalt', type: 'textarea', default: 'Inhalt 3' }
+                    { name: 'col3Content', label: 'Spalte 3 Inhalt', type: 'textarea', default: 'Inhalt 3' },
+                    { name: 'col3ButtonText', label: 'Spalte 3 Button', type: 'text', default: 'Mehr' },
+                    { name: 'col3ButtonLink', label: 'Spalte 3 Link', type: 'text', default: 'https://www.start-with-a-friend.de/' }
                 ]
             },
             'quote': {
@@ -1111,6 +1318,43 @@
                     { name: 'buttonLink', label: 'Button Link', type: 'text', default: 'https://www.start-with-a-friend.de/mitmachen/' }
                 ]
             },
+            'three-buttons': {
+                title: 'Drei Buttons',
+                html: `
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 20px 30px;">
+                                    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                                        <tr>
+                                            <td width="31%" align="center" valign="top">
+                                                <a href="{{button1Link}}" style="display: inline-block; background: #009a93; color: white; padding: 12px 20px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 14px; width: 100%; text-align: center; box-sizing: border-box;">{{button1Text}}</a>
+                                            </td>
+                                            <td width="3.5%"></td>
+                                            <td width="31%" align="center" valign="top">
+                                                <a href="{{button2Link}}" style="display: inline-block; background: #009a93; color: white; padding: 12px 20px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 14px; width: 100%; text-align: center; box-sizing: border-box;">{{button2Text}}</a>
+                                            </td>
+                                            <td width="3.5%"></td>
+                                            <td width="31%" align="center" valign="top">
+                                                <a href="{{button3Link}}" style="display: inline-block; background: #009a93; color: white; padding: 12px 20px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 14px; width: 100%; text-align: center; box-sizing: border-box;">{{button3Text}}</a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `,
+                fields: [
+                    { name: 'button1Text', label: 'Button 1 Text', type: 'text', default: 'Button 1' },
+                    { name: 'button1Link', label: 'Button 1 Link', type: 'text', default: 'https://www.start-with-a-friend.de/' },
+                    { name: 'button2Text', label: 'Button 2 Text', type: 'text', default: 'Button 2' },
+                    { name: 'button2Link', label: 'Button 2 Link', type: 'text', default: 'https://www.start-with-a-friend.de/' },
+                    { name: 'button3Text', label: 'Button 3 Text', type: 'text', default: 'Button 3' },
+                    { name: 'button3Link', label: 'Button 3 Link', type: 'text', default: 'https://www.start-with-a-friend.de/' }
+                ]
+            },
+
             'cta-section': {
                 title: 'Call-to-Action',
                 html: `
@@ -1272,24 +1516,6 @@
                 `,
                 fields: []
             },
-            'unsubscribe': {
-                title: 'Abmelde-Link',
-                html: `
-                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
-                        <tbody>
-                            <tr>
-                                <td style="padding: 20px 30px; text-align: center; color: #666; font-size: 12px;">
-                                    <p>{{unsubscribeText}} <a href="<!--#unsubscribe#-->" style="color: #666;">{{unsubscribeLinkText}}</a></p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                `,
-                fields: [
-                    { name: 'unsubscribeText', label: 'Abmelde-Text', type: 'text', default: 'Wenn Sie diese E-Mail nicht mehr empfangen möchten, können Sie diese' },
-                    { name: 'unsubscribeLinkText', label: 'Link Text', type: 'text', default: 'hier kostenlos abbestellen' }
-                ]
-            }
         };
 
         // Template Builder Class
@@ -1484,19 +1710,52 @@
                 // Special handling for events module
                 if (moduleData.type === 'events') {
                     const events = moduleData.fields.events || [];
-                    let eventsHtml = '<h2 style="color: #009a93; text-align: center; margin: 20px 0;">' + 
-                                     (moduleData.fields.eventsTitle || 'Unsere nächsten Events') + '</h2>';
+                    const validEvents = events.filter(event => event.title && event.title.trim() !== '' && event.title !== 'Event');
                     
-                    if (events.length === 0) {
-                        eventsHtml += '<p style="text-align: center; color: #666;">Keine Events vorhanden. Klicken Sie auf "Bearbeiten" um Events hinzuzufügen.</p>';
+                    let eventsHtml = `
+                        <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                            <tbody>
+                                <tr>
+                                    <td style="padding: 20px 30px; text-align: center;">
+                                        <h2 style="color: #009a93; margin: 0 0 20px 0; font-size: 24px; font-weight: bold;">
+                                            ${moduleData.fields.eventsTitle || 'Unsere nächsten Events'}
+                                        </h2>
+                                        ${validEvents.length > 0 ? 
+                                            `<p style="color: #666; margin: 0 0 30px 0; font-size: 16px;">
+                                                Entdecke ${validEvents.length} spannende Event${validEvents.length !== 1 ? 's' : ''} in deiner Nähe:
+                                            </p>` : ''
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
+                    
+                    if (validEvents.length === 0) {
+                        eventsHtml += `
+                            <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                                <tbody>
+                                    <tr>
+                                        <td style="padding: 20px 30px; text-align: center;">
+                                            <div style="background: #f8f9fa; border: 2px dashed #ddd; border-radius: 8px; padding: 40px; margin: 20px 0;">
+                                                <p style="color: #666; margin: 0; font-size: 16px;">
+                                                    📅 Keine Events vorhanden.<br>
+                                                    Klicken Sie auf "Bearbeiten" um Events hinzuzufügen.
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        `;
                     } else {
-                        events.forEach(event => {
-                            eventsHtml += this.renderEventHTML(event);
+                        validEvents.forEach((event, index) => {
+                            eventsHtml += this.renderEventHTML(event, index);
                         });
                     }
                     
                     html = html.replace('{{eventsContent}}', eventsHtml);
-                } else {
+} else {
                     // Replace placeholders with field values
                     template.fields.forEach(field => {
                         const value = moduleData.fields[field.name] || field.default;
@@ -1508,29 +1767,38 @@
                 return html;
             }
 
-            renderEventHTML(event) {
+            renderEventHTML(event, index) {
+                const eventNumber = index + 1;
+                const isHighlighted = event.highlight || false;
+                const highlightStyle = isHighlighted ? 'background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%); border: 2px solid #ffc107;' : '';
+                const highlightBadge = isHighlighted ? '<div style="position: absolute; top: 10px; right: 10px; background: #ffc107; color: #000; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold;">⭐ HIGHLIGHT</div>' : '';
+                
                 return `
                     <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
                         <tbody>
                             <tr>
                                 <td style="padding: 15px 30px;">
-                                    <table style="width: 100%; border: 1px solid #e0e0e0; border-radius: 8px;">
+                                    <table style="width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; position: relative; ${highlightStyle}">
                                         <tr>
-                                            <td style="padding: 20px;">
-                                                <table>
+                                            <td style="padding: 20px; position: relative;">
+                                                ${highlightBadge}
+                                                <div style="position: absolute; top: 10px; left: 10px; background: #009a93; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">
+                                                    ${eventNumber}
+                                                </div>
+                                                <table style="margin-top: 10px;">
                                                     <tr>
-                                                        <td style="width: 60px; vertical-align: top;">
-                                                            <div style="background: #009a93; color: white; padding: 8px; border-radius: 4px; text-align: center;">
-                                                                <div style="font-size: 11px;">${event.month || 'TBD'}</div>
+                                                        <td style="width: 70px; vertical-align: top;">
+                                                            <div style="background: #009a93; color: white; padding: 8px; border-radius: 4px; text-align: center; margin-left: 10px;">
+                                                                <div style="font-size: 11px; text-transform: uppercase;">${event.month || 'TBD'}</div>
                                                                 <div style="font-size: 20px; font-weight: bold;">${event.day || '?'}</div>
                                                             </div>
                                                         </td>
                                                         <td style="padding-left: 20px;">
-                                                            <h3 style="color: #009a93; margin: 0 0 10px 0;">${event.title}</h3>
-                                                            <p style="margin: 5px 0;"><strong>Zeit:</strong> ${event.time}</p>
-                                                            <p style="margin: 5px 0;"><strong>Ort:</strong> ${event.location}</p>
-                                                            <p style="margin: 10px 0;">${event.description}</p>
-                                                            ${event.registrationLink ? `<a href="${event.registrationLink}" style="color: #009a93;">Jetzt anmelden →</a>` : ''}
+                                                            <h3 style="color: #009a93; margin: 0 0 10px 0; font-size: 16px; line-height: 1.3;">${event.title}</h3>
+                                                            ${event.time ? `<p style="margin: 5px 0; font-size: 14px;"><strong>⏰ Zeit:</strong> ${event.time}</p>` : ''}
+                                                            ${event.location ? `<p style="margin: 5px 0; font-size: 14px;"><strong>📍 Ort:</strong> ${event.location}</p>` : ''}
+                                                            ${event.description ? `<p style="margin: 10px 0 15px 0; font-size: 14px; line-height: 1.4; color: #555;">${event.description}</p>` : ''}
+                                                            ${event.registrationLink ? `<a href="${event.registrationLink}" style="display: inline-block; background: #009a93; color: white; padding: 10px 20px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 15px; margin-top: 10px;">🎯 Jetzt anmelden</a>` : ''}
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -1669,7 +1937,7 @@
                 
                 const events = module.fields.events || [];
                 events.forEach((event, index) => {
-                    html += this.buildEventCard(event, index);
+                    html += this.buildEditorEventCard(event, index);
                 });
                 
                 if (events.length === 0) {
@@ -1683,6 +1951,44 @@
                 return html;
             }
 
+            buildEditorEventCard(event, index) {
+            const personalizedTitle = this.cleanEventTitle(event.title);
+            const personalizedDescription = event.description ? event.description : '';
+            
+            return `
+                <div class="event-card" data-index="${index}">
+                    <div class="event-card-header">
+                        <div style="display: flex; align-items: start; gap: 15px; flex: 1;">
+                            <div class="event-date-box">
+                                <div class="event-date-month">${event.month || 'TBD'}</div>
+                                <div class="event-date-day">${event.day || '?'}</div>
+                            </div>
+                            <div style="flex: 1;">
+                                <input type="text" value="${personalizedTitle}" onchange="templateBuilder.updateEvent(${index}, 'title', this.value)" style="width: 100%; margin-bottom: 5px; font-weight: bold;" placeholder="Event Titel">
+                                <input type="date" value="${event.date || ''}" onchange="templateBuilder.updateEvent(${index}, 'date', this.value)" style="width: 100%; margin-bottom: 5px;">
+                                <input type="text" value="${event.time || ''}" onchange="templateBuilder.updateEvent(${index}, 'time', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Uhrzeit (z.B. 18:00 Uhr)">
+                                <input type="text" value="${event.location || ''}" onchange="templateBuilder.updateEvent(${index}, 'location', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Ort">
+                                <textarea onchange="templateBuilder.updateEvent(${index}, 'description', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Beschreibung">${personalizedDescription}</textarea>
+                                <input type="text" value="${event.registrationLink || ''}" onchange="templateBuilder.updateEvent(${index}, 'registrationLink', this.value)" style="width: 100%;" placeholder="Anmelde-Link (optional)">
+                            </div>
+                        </div>
+                        <div class="event-badges">
+                            ${event.category ? `<span class="badge badge-category">${event.category}</span>` : ''}
+                            ${event.eventMode ? `<span class="badge badge-mode">${event.eventMode}</span>` : ''}
+                            ${event.highlight ? `<span class="badge" style="background: #ffc107; color: #000;">⭐ HIGHLIGHT</span>` : ''}
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+                        <label style="display: flex; align-items: center; cursor: pointer;">
+                            <input type="checkbox" ${event.highlight ? 'checked' : ''} onchange="templateBuilder.updateEvent(${index}, 'highlight', this.checked)" style="margin-right: 8px; width: 18px; height: 18px; cursor: pointer;">
+                            <span style="font-weight: bold; color: #ffc107;">⭐ Als Highlight markieren</span>
+                        </label>
+                        <button class="delete-module" onclick="templateBuilder.removeEvent(${index})">Event löschen</button>
+                    </div>
+                </div>
+            `;
+        }
+
             showEventImport() {
                 document.getElementById('eventImportModal').style.display = 'block';
                 document.getElementById('overlay').style.display = 'block';
@@ -1691,6 +1997,16 @@
             closeEventImport() {
                 document.getElementById('eventImportModal').style.display = 'none';
                 document.getElementById('overlay').style.display = 'none';
+            }
+
+            cleanEventTitle(title) {
+                if (!title) return '';
+                return title
+                    .replace(/\n+/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .replace(/Anmeldungen?\s+(möglich|geschlossen)/gi, '')
+                    .replace(/Anmeldung\s+(möglich|geschlossen)/gi, '')
+                    .trim();
             }
 
             importPastedEvents() {
@@ -1709,10 +2025,27 @@
                         throw new Error('Die Daten sind kein gültiges Event-Array');
                     }
                     
-                    if (events.length === 0) {
-                        this.showNotification('Keine Events in den Daten gefunden', true);
+                    // Filter out invalid events
+                    const validEvents = events.filter(event => 
+                        event.title && 
+                        event.title.trim() !== '' && 
+                        event.title !== 'Event' &&
+                        event.title.length > 3
+                    );
+                    
+                    if (validEvents.length === 0) {
+                        this.showNotification('Keine gültigen Events in den Daten gefunden', true);
                         return;
                     }
+                    
+                    // Remove duplicates
+                    const uniqueEvents = validEvents.filter((event, index, self) => 
+                        index === self.findIndex(e => 
+                            e.title === event.title && 
+                            e.time === event.time && 
+                            e.date === event.date
+                        )
+                    );
                     
                     // Add events to current module
                     if (this.currentEditingModule) {
@@ -1721,24 +2054,32 @@
                         }
                         
                         // Process events for CleverReach personalization
-                        events.forEach(event => {
+                        uniqueEvents.forEach(event => {
                             if (event.title) {
-                                event.title = event.title.replace(/\{NAME\}/g, '{FIRSTNAME[std:Hi]}');
+                                event.title = this.cleanEventTitle(event.title).replace(/\{NAME\}/g, '{FIRSTNAME[std:Hi]}');
                             }
                             if (event.description) {
                                 event.description = event.description.replace(/\{NAME\}/g, '{FIRSTNAME[std:Hi]}');
+                            }
+                            
+                            // Ensure date fields are properly set
+                            if (event.date && !event.month) {
+                                const date = new Date(event.date);
+                                const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
+                                event.month = months[date.getMonth()];
+                                event.day = date.getDate().toString();
                             }
                         });
                         
                         // Ask if existing events should be kept
                         if (this.currentEditingModule.fields.events.length > 0) {
                             if (confirm(`Es sind bereits ${this.currentEditingModule.fields.events.length} Events vorhanden. Möchten Sie die neuen Events hinzufügen (OK) oder ersetzen (Abbrechen)?`)) {
-                                this.currentEditingModule.fields.events.push(...events);
+                                this.currentEditingModule.fields.events.push(...uniqueEvents);
                             } else {
-                                this.currentEditingModule.fields.events = events;
+                                this.currentEditingModule.fields.events = uniqueEvents;
                             }
                         } else {
-                            this.currentEditingModule.fields.events = events;
+                            this.currentEditingModule.fields.events = uniqueEvents;
                         }
                         
                         // Clear textarea
@@ -1747,7 +2088,7 @@
                         // Refresh editor
                         this.editModule(this.currentEditingModule.id);
                         
-                        this.showNotification(`${events.length} Events erfolgreich importiert!`, false, 'success');
+                        this.showNotification(`${uniqueEvents.length} Events erfolgreich importiert! (${events.length - uniqueEvents.length} Duplikate/ungültige Events entfernt)`, false, 'success');
                     }
                     
                 } catch (error) {
@@ -1756,40 +2097,58 @@
                 }
             }
 
+            cleanEventTitle(title) {
+                if (!title) return '';
+                return title
+                    .replace(/\n/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .replace(/Anmeldungen? (möglich|geschlossen)/gi, '')
+                    .replace(/Anmeldung (möglich|geschlossen)/gi, '')
+                    .trim();
+            }
+
             buildEventCard(event, index) {
-                // CleverReach Personalisierung
-                const personalizedTitle = event.title ? event.title.replace(/\{NAME\}/g, '{FIRSTNAME[std:Hi]}') : event.title;
-                const personalizedDescription = event.description ? event.description.replace(/\{NAME\}/g, '{FIRSTNAME[std:Hi]}') : event.description;
+                const eventNumber = index + 1;
+                const isHighlighted = event.highlight || false;
+                const highlightStyle = isHighlighted ? 'background: linear-gradient(135deg, #fff9e6 0%, #ffffff 100%); border: 2px solid #ffc107;' : '';
+                const highlightBadge = isHighlighted ? '<div style="position: absolute; top: 10px; right: 10px; background: #ffc107; color: #000; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: bold;">⭐ HIGHLIGHT</div>' : '';
                 
                 return `
-                    <div class="event-card" data-index="${index}">
-                        <div class="event-card-header">
-                            <div style="display: flex; align-items: start; gap: 15px; flex: 1;">
-                                <div class="event-date-box">
-                                    <div class="event-date-month">${event.month || 'TBD'}</div>
-                                    <div class="event-date-day">${event.day || '?'}</div>
-                                </div>
-                                <div style="flex: 1;">
-                                    <input type="text" value="${personalizedTitle}" onchange="templateBuilder.updateEvent(${index}, 'title', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Event Titel">
-                                    <input type="date" value="${event.date || ''}" onchange="templateBuilder.updateEvent(${index}, 'date', this.value)" style="width: 100%; margin-bottom: 5px;">
-                                    <input type="text" value="${event.time}" onchange="templateBuilder.updateEvent(${index}, 'time', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Uhrzeit">
-                                    <input type="text" value="${event.location}" onchange="templateBuilder.updateEvent(${index}, 'location', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Ort">
-                                    <textarea onchange="templateBuilder.updateEvent(${index}, 'description', this.value)" style="width: 100%; margin-bottom: 5px;" placeholder="Beschreibung">${personalizedDescription}</textarea>
-                                    <input type="text" value="${event.registrationLink || ''}" onchange="templateBuilder.updateEvent(${index}, 'registrationLink', this.value)" style="width: 100%;" placeholder="Anmelde-Link (optional)">
-                                    <div style="margin-top: 5px; font-size: 11px; color: #666;">
-                                        Tipp: Verwenden Sie {FIRSTNAME[std:Hi]} für personalisierte Anrede in CleverReach
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="event-badges">
-                                ${event.category ? `<span class="badge badge-category">${event.category}</span>` : ''}
-                                ${event.eventMode ? `<span class="badge badge-mode">${event.eventMode}</span>` : ''}
-                            </div>
-                        </div>
-                        <div style="margin-top: 10px; text-align: right;">
-                            <button class="delete-module" onclick="templateBuilder.removeEvent(${index})">Event löschen</button>
-                        </div>
-                    </div>
+                    <table align="center" border="0" cellpadding="0" cellspacing="0" style="width:640px">
+                        <tbody>
+                            <tr>
+                                <td style="padding: 15px 30px;">
+                                    <table style="width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; position: relative; ${highlightStyle}">
+                                        <tr>
+                                            <td style="padding: 20px; position: relative;">
+                                                ${highlightBadge}
+                                                <div style="position: absolute; top: 10px; left: 10px; background: #009a93; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">
+                                                    ${eventNumber}
+                                                </div>
+                                                <table style="margin-top: 10px;">
+                                                    <tr>
+                                                        <td style="width: 70px; vertical-align: top;">
+                                                            <div style="background: #009a93; color: white; padding: 8px; border-radius: 4px; text-align: center; margin-left: 10px;">
+                                                                <div style="font-size: 11px; text-transform: uppercase;">${event.month || 'TBD'}</div>
+                                                                <div style="font-size: 20px; font-weight: bold;">${event.day || '?'}</div>
+                                                            </div>
+                                                        </td>
+                                                        <td style="padding-left: 20px;">
+                                                            <h3 style="color: #009a93; margin: 0 0 10px 0; font-size: 16px; line-height: 1.3;">${event.title}</h3>
+                                                            ${event.time ? `<p style="margin: 5px 0; font-size: 14px;"><strong>⏰ Zeit:</strong> ${event.time}</p>` : ''}
+                                                            ${event.location ? `<p style="margin: 5px 0; font-size: 14px;"><strong>📍 Ort:</strong> ${event.location}</p>` : ''}
+                                                            ${event.description ? `<p style="margin: 10px 0 15px 0; font-size: 14px; line-height: 1.4; color: #555;">${event.description}</p>` : ''}
+                                                            ${event.registrationLink ? `<a href="${event.registrationLink}" style="display: inline-block; background: #009a93; color: white; padding: 12px 24px; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 15px; margin-top: 12px;">🎯 Jetzt anmelden</a>` : ''}
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 `;
             }
 
@@ -2218,6 +2577,23 @@
         td { padding: 0; }
         img { border: 0; display: block; }
     </style>
+    <style type="text/css">
+        @media only screen and (max-width: 640px) {
+            table[style*="width:640px"], table[class="email-container"] {
+                width: 100% !important;
+            }
+            h2 {
+                font-size: 20px !important;
+            }
+            h3 {
+                font-size: 14px !important;
+            }
+            a[style*="inline-block"] {
+                display: block !important;
+                text-align: center !important;
+            }
+        }
+    </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f5f5f5;">
     <center>
@@ -2225,11 +2601,38 @@
             <tr>
                 <td align="center" valign="top">`;
                 
-                this.modules.forEach(module => {
+                // Zuerst: Pflicht-Module am Anfang (Preheader, Header)
+                const mandatoryStart = ['preheader', 'header'];
+                const mandatoryEnd = ['footer-imprint', 'unsubscribe'];
+
+                // Module sortieren
+                const startModules = this.modules.filter(m => mandatoryStart.includes(m.type));
+                const contentModules = this.modules.filter(m => !mandatoryStart.includes(m.type) && !mandatoryEnd.includes(m.type));
+                const endModules = this.modules.filter(m => mandatoryEnd.includes(m.type));
+
+                // Render in richtiger Reihenfolge
+                [...startModules, ...contentModules, ...endModules].forEach(module => {
                     html += this.renderModuleContent(module);
                 });
                 
                 html += `
+                </td>
+            </tr>
+        </table>
+    <!-- Abmelde-Link -->
+                    <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #ffffff;">
+                        <tr>
+                            <td align="center" style="padding: 20px 30px;">
+                                <div style="font-size: 12px; color: #666; text-align: center; border-top: 1px solid #e0e0e0; padding-top: 20px;">
+                                    Wenn du diese E-Mail (an: {EMAIL}) nicht mehr empfangen möchtest, kannst du <strong>sie </strong>
+                                    <a href="https://newsletter.start-with-a-friend.de/rmftlp.php?cid=[CTID]&mid=[MAILING_ID]&h=[CTID]-[USER_ID_SECURE]" 
+                                       style="color: #009a93; text-decoration: underline;">
+                                        <strong>hier</strong>
+                                    </a> abbestellen.
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
                 </td>
             </tr>
         </table>
@@ -2303,5 +2706,59 @@
         // Initialize the application
         const templateBuilder = new TemplateBuilder();
     </script>
+<!-- Help Modal -->
+<div id="helpModal" class="modal">
+    <div class="modal-content" style="max-width: 800px;">
+        <div class="modal-header">
+            <h2>📚 Newsletter Builder Anleitung</h2>
+        </div>
+        <div style="padding: 0 24px 24px;">
+            <h3 style="color: #009a93; margin-top: 20px;">🚀 Wie nutze ich den Editor?</h3>
+            <ol style="line-height: 1.8;">
+                <li><strong>Module hinzufügen:</strong> Ziehen Sie Module aus der linken Sidebar in den Vorschau-Bereich</li>
+                <li><strong>Bearbeiten:</strong> Klicken Sie auf "✎ Bearbeiten" um Inhalte anzupassen</li>
+                <li><strong>Reihenfolge ändern:</strong> Nutzen Sie ↑↓ oder ziehen Sie Module per Drag & Drop</li>
+                <li><strong>Events importieren:</strong> Klicken Sie im Events-Modul auf "📥 Events importieren"</li>
+            </ol>
+
+            <h3 style="color: #009a93; margin-top: 20px;">📥 Events vom Portal importieren</h3>
+            <ol style="line-height: 1.8;">
+                <li>Ziehen Sie das Bookmarklet in Ihre Lesezeichen-Leiste</li>
+                <li>Öffnen Sie <a href="https://portal.startwithafriend.de/events" target="_blank">portal.startwithafriend.de/events</a></li>
+                <li>Klicken Sie auf das Bookmarklet → Events werden in Zwischenablage kopiert</li>
+                <li>Fügen Sie die Events im Editor ein (Strg+V)</li>
+            </ol>
+
+            <h3 style="color: #009a93; margin-top: 20px;">📤 Newsletter in CleverReach einfügen</h3>
+            <ol style="line-height: 1.8;">
+                <li>Klicken Sie auf "📋 HTML kopieren" (oben rechts im Editor)</li>
+                <li>Gehen Sie zu CleverReach → Neuen Newsletter erstellen</li>
+                <li>Wählen Sie "HTML-Editor" als Template-Typ</li>
+                <li>Fügen Sie den kopierten HTML-Code ein (Strg+V)</li>
+                <li>Speichern und Vorschau prüfen</li>
+            </ol>
+
+            <h3 style="color: #009a93; margin-top: 20px;">💾 Vorlagen speichern</h3>
+            <ol style="line-height: 1.8;">
+                <li><strong>Speichern:</strong> Klicken Sie auf "Speichern" → Name eingeben → Im Browser gespeichert</li>
+                <li><strong>Laden:</strong> Klicken Sie auf "Laden" → Vorlage auswählen</li>
+                <li><strong>Export JSON:</strong> Als Datei exportieren (zur Weitergabe/Backup)</li>
+                <li><strong>Import JSON:</strong> JSON-Datei importieren</li>
+            </ol>
+
+            <h3 style="color: #009a93; margin-top: 20px;">💡 Tipps</h3>
+            <ul style="line-height: 1.8;">
+                <li>Pflicht-Module (Preheader, Header, Footer) werden automatisch sortiert</li>
+                <li>Nutzen Sie <code>{FIRSTNAME[std:Hi]}</code> für Personalisierung in CleverReach</li>
+                <li>Markieren Sie wichtige Events als "⭐ Highlight"</li>
+                <li>Testen Sie den Newsletter auf Mobile (F12 → Handy-Symbol)</li>
+            </ul>
+        </div>
+        <div class="modal-actions">
+            <button class="primary-btn" id="closeHelp">Verstanden</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
