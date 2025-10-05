@@ -1709,7 +1709,7 @@
                 
                 // Special handling for events module
                 if (moduleData.type === 'events') {
-                    const events = moduleData.fields.events || [];
+                    const events = this.sortEventsByDate(moduleData.fields.events || []);
                     const validEvents = events.filter(event => event.title && event.title.trim() !== '' && event.title !== 'Event');
                     
                     let eventsHtml = `
@@ -1935,7 +1935,7 @@
                 html += '<button class="primary-btn" onclick="templateBuilder.showEventImport()">📥 Events importieren</button>';
                 html += '<div class="dynamic-items-list" style="margin-top: 15px;">';
                 
-                const events = module.fields.events || [];
+                const events = this.sortEventsByDate(module.fields.events || []);
                 events.forEach((event, index) => {
                     html += this.buildEditorEventCard(event, index);
                 });
@@ -2075,11 +2075,12 @@
                         if (this.currentEditingModule.fields.events.length > 0) {
                             if (confirm(`Es sind bereits ${this.currentEditingModule.fields.events.length} Events vorhanden. Möchten Sie die neuen Events hinzufügen (OK) oder ersetzen (Abbrechen)?`)) {
                                 this.currentEditingModule.fields.events.push(...uniqueEvents);
+                                this.currentEditingModule.fields.events = this.sortEventsByDate(this.currentEditingModule.fields.events);
                             } else {
-                                this.currentEditingModule.fields.events = uniqueEvents;
+                                this.currentEditingModule.fields.events = this.sortEventsByDate(uniqueEvents);
                             }
                         } else {
-                            this.currentEditingModule.fields.events = uniqueEvents;
+                            this.currentEditingModule.fields.events = this.sortEventsByDate(uniqueEvents);
                         }
                         
                         // Clear textarea
@@ -2252,6 +2253,18 @@
                 this.editModule(this.currentEditingModule.id);
             }
 
+            sortEventsByDate(events) {
+                return events.sort((a, b) => {
+                    // Events ohne Datum ans Ende
+                    if (!a.date && !b.date) return 0;
+                    if (!a.date) return 1;
+                    if (!b.date) return -1;
+                    
+                    // Nach Datum sortieren
+                    return new Date(a.date) - new Date(b.date);
+                });
+            }
+            
             updateEvent(index, field, value) {
                 if (this.currentEditingModule && this.currentEditingModule.fields.events) {
                     this.currentEditingModule.fields.events[index][field] = value;
