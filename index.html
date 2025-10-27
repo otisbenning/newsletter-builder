@@ -2086,13 +2086,6 @@
                 return html;
             }
 
-            // Events nach Sortierung neu rendern
-            renderSortedEvents() {
-                if (this.currentEditingModule && this.currentEditingModule.fields.events) {
-                    this.currentEditingModule.fields.events = this.sortEventsByDate(this.currentEditingModule.fields.events);
-                    this.editModule(this.currentEditingModule.id);
-                }
-            }
 
             buildEditorEventCard(event, index) {
             const personalizedTitle = this.cleanEventTitle(event.title);
@@ -2407,13 +2400,11 @@
             }
 
             addManualEvent() {
-                if (!this.currentEditingModule) return;
-                
                 const today = new Date();
                 const months = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'];
                 
                 const newEvent = {
-                    title: 'Neues Event - {FIRSTNAME[std:Hi]}, sei dabei!',
+                    title: 'Neues Event',
                     month: months[today.getMonth()],
                     day: today.getDate().toString(),
                     date: today.toISOString().split('T')[0],
@@ -2431,7 +2422,8 @@
                 
                 this.currentEditingModule.fields.events.push(newEvent);
                 
-                // Refresh editor
+                // Events sortieren und Editor neu laden
+                this.currentEditingModule.fields.events = this.sortEventsByDate(this.currentEditingModule.fields.events);
                 this.editModule(this.currentEditingModule.id);
             }
 
@@ -2458,18 +2450,13 @@
                         this.currentEditingModule.fields.events[index].month = months[date.getMonth()];
                         this.currentEditingModule.fields.events[index].day = date.getDate().toString();
                         
-                        // Update the display immediately
-                        const eventCard = document.querySelector(`.event-card[data-index="${index}"]`);
-                        if (eventCard) {
-                            const monthElement = eventCard.querySelector('.event-date-month');
-                            const dayElement = eventCard.querySelector('.event-date-day');
-                            if (monthElement) monthElement.textContent = months[date.getMonth()];
-                            if (dayElement) dayElement.textContent = date.getDate().toString();
-                        }
-                        
-                        // Events neu sortieren und anzeigen
-                        setTimeout(() => this.renderSortedEvents(), 500);
+                        // Events SOFORT neu sortieren und Editor komplett neu rendern
+                        this.currentEditingModule.fields.events = this.sortEventsByDate(this.currentEditingModule.fields.events);
+                        this.editModule(this.currentEditingModule.id);
                     }
+                    
+                    // Bei anderen Feldänderungen auch Vorschau aktualisieren
+                    this.renderPreview();
                 }
             }
 
