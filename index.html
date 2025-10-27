@@ -503,6 +503,78 @@
             background: #007a73;
         }
 
+        /* Rich Text Editor */
+        .rich-text-editor {
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            min-height: 150px;
+            padding: 12px;
+            background: white;
+            font-family: 'GT Walsheim', Arial, sans-serif;
+            line-height: 1.6;
+            outline: none;
+        }
+
+        .rich-text-editor:focus {
+            border-color: var(--primary-color);
+        }
+
+        .rich-text-toolbar {
+            display: flex;
+            gap: 5px;
+            padding: 8px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .rich-text-btn {
+            padding: 6px 10px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            min-width: 32px;
+            text-align: center;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .rich-text-btn:hover {
+            background: #e9f7f6;
+            border-color: var(--primary-color);
+        }
+
+        .rich-text-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 24px;
+            background: #ddd;
+            margin: 0 5px;
+        }
+
+        .color-picker-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .color-picker {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
         /* Paste Events Box */
         .paste-events-box {
             border: 2px solid #ddd;
@@ -833,6 +905,18 @@
                         📋 Code in Zwischenablage kopieren
                     </button>
                     
+                    <p style="margin: 15px 0; font-size: 14px; font-weight: bold;">ODER ziehen Sie diesen Link direkt in Ihre Lesezeichenleiste:</p>
+                    <div style="text-align: center; padding: 15px; background: #f0f0f0; border-radius: 6px;">
+                        <a href='javascript:(function(){/* BOOKMARKLET CODE HIER */})();' 
+                        class="bookmarklet-link" 
+                        draggable="true"
+                        style="display: inline-block; background: var(--primary-color); color: white !important; padding: 15px 30px; border-radius: 6px; text-decoration: none; font-weight: bold; cursor: move; box-shadow: 0 4px 12px rgba(0, 153, 147, 0.3);">
+                            📚 SwaF Events Sammler
+                        </a>
+                        <p style="margin-top: 10px; font-size: 12px; color: #666;">
+                            ⬆️ Einfach in die Lesezeichen-Leiste ziehen!
+                        </p>
+                    </div>
                     <div id="copySuccess" style="display: none; background: #d4edda; border: 1px solid #c3e6cb; padding: 10px; border-radius: 4px; margin-top: 10px;">
                         <p style="margin: 0; color: #155724; font-weight: bold;">✅ Code kopiert!</p>
                     </div>
@@ -2179,9 +2263,48 @@
                 html += `<label for="${field.name}">${field.label}</label>`;
                 
                 switch (field.type) {
-                    case 'textarea':
-                        html += `<textarea id="${field.name}" name="${field.name}">${value || field.default}</textarea>`;
-                        break;
+                case 'textarea':
+                    html += `
+                        <div class="rich-text-toolbar">
+                            <button type="button" class="rich-text-btn" data-command="bold" onclick="formatText('bold')" title="Fett (Strg+B)">
+                                <strong>B</strong>
+                            </button>
+                            <button type="button" class="rich-text-btn" data-command="italic" onclick="formatText('italic')" title="Kursiv (Strg+I)">
+                                <em>I</em>
+                            </button>
+                            <button type="button" class="rich-text-btn" data-command="underline" onclick="formatText('underline')" title="Unterstrichen (Strg+U)">
+                                <u>U</u>
+                            </button>
+                            <button type="button" class="rich-text-btn" data-command="strikeThrough" onclick="formatText('strikeThrough')" title="Durchgestrichen">
+                                <s>S</s>
+                            </button>
+                            <span class="toolbar-separator"></span>
+                            <button type="button" class="rich-text-btn" onclick="insertLink()" title="Link einfügen">
+                                🔗
+                            </button>
+                            <span class="toolbar-separator"></span>
+                            <button type="button" class="rich-text-btn" onclick="formatText('insertUnorderedList')" title="Aufzählungsliste">
+                                •
+                            </button>
+                            <button type="button" class="rich-text-btn" onclick="formatText('insertOrderedList')" title="Nummerierte Liste">
+                                1.
+                            </button>
+                            <span class="toolbar-separator"></span>
+                            <div class="color-picker-wrapper">
+                                <button type="button" class="rich-text-btn" title="Textfarbe">
+                                    🎨
+                                </button>
+                                <div style="position: absolute; top: 100%; left: 0; background: white; border: 1px solid #ddd; padding: 8px; border-radius: 4px; display: none; z-index: 1000;" class="color-menu">
+                                    <button type="button" style="background: #009a93; width: 30px; height: 30px; border: none; margin: 2px; cursor: pointer;" onclick="changeTextColor('#009a93')" title="Türkis"></button>
+                                    <button type="button" style="background: #c5003d; width: 30px; height: 30px; border: none; margin: 2px; cursor: pointer;" onclick="changeTextColor('#c5003d')" title="Rot"></button>
+                                    <button type="button" style="background: #213293; width: 30px; height: 30px; border: none; margin: 2px; cursor: pointer;" onclick="changeTextColor('#213293')" title="Dunkelblau"></button>
+                                    <button type="button" style="background: #000000; width: 30px; height: 30px; border: none; margin: 2px; cursor: pointer;" onclick="changeTextColor('#000000')" title="Schwarz"></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="${field.name}" class="rich-text-editor" contenteditable="true" data-field="${field.name}">${value || field.default}</div>
+                    `;
+                    break;
                     case 'image':
                         html += `<input type="text" id="${field.name}" name="${field.name}" value="${value || field.default}">`;
                         html += `<button class="image-upload-btn" data-field="${field.name}">Bild hochladen</button>`;
@@ -2338,7 +2461,12 @@
                     if (field.type !== 'dynamic-list') {
                         const input = document.getElementById(field.name);
                         if (input) {
-                            this.currentEditingModule.fields[field.name] = input.value;
+                            // Prüfe ob es ein Rich-Text-Editor ist (contenteditable)
+                            if (input.classList.contains('rich-text-editor')) {
+                                this.currentEditingModule.fields[field.name] = input.innerHTML;
+                            } else {
+                                this.currentEditingModule.fields[field.name] = input.value;
+                            }
                         }
                     }
                 });
@@ -2744,6 +2872,59 @@
                 }, 3000);
             }
         }
+
+        // ===============================
+        // RICH TEXT FORMATTING FUNCTIONS
+        // ===============================
+        function formatText(command) {
+            document.execCommand(command, false, null);
+            updateToolbarState();
+        }
+
+        function insertLink() {
+            const url = prompt('Link-URL eingeben:', 'https://');
+            if (url) {
+                document.execCommand('createLink', false, url);
+            }
+        }
+
+        function changeTextColor(color) {
+            document.execCommand('foreColor', false, color);
+        }
+
+        function updateToolbarState() {
+            const commands = ['bold', 'italic', 'underline', 'strikeThrough'];
+            commands.forEach(cmd => {
+                const btn = document.querySelector(`[data-command="${cmd}"]`);
+                if (btn) {
+                    btn.classList.toggle('active', document.queryCommandState(cmd));
+                }
+            });
+        }
+
+        // Event listener für contenteditable Felder
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('rich-text-editor')) {
+                    updateToolbarState();
+                }
+            });
+        });
+
+        // Farb-Menü Toggle
+        document.addEventListener('click', function(e) {
+            if (e.target.textContent === '🎨') {
+                const menu = e.target.nextElementSibling;
+                if (menu) {
+                    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+                }
+            } else {
+                // Alle Farb-Menüs schließen, wenn außerhalb geklickt wird
+                document.querySelectorAll('.color-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            }
+        });
 
         // Initialize the application
         const templateBuilder = new TemplateBuilder();
