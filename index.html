@@ -2231,9 +2231,8 @@
                         // Clear textarea
                         textarea.value = '';
                         
-                        // Refresh editor UND Vorschau
+                        // Refresh editor
                         this.editModule(this.currentEditingModule.id);
-                        this.showPreview();
                         
                         this.showNotification(`${uniqueEvents.length} Events erfolgreich importiert! (${events.length - uniqueEvents.length} Duplikate/ungültige Events entfernt)`, false, 'success');
                     }
@@ -2459,10 +2458,7 @@
                     
                     // Editor neu laden um sortierte Events anzuzeigen
                     this.editModule(this.currentEditingModule.id);
-                    
-                    // Vorschau aktualisieren
-                    this.showPreview();
-                    
+                                        
                     this.showNotification('Events nach Datum sortiert', false, 'success');
                 }
             }
@@ -2553,7 +2549,6 @@
                 }
                 
                 this.closeModuleEditor();
-                this.showPreview(); // Vorschau auch aktualisieren
                 this.autoSave();
                 this.showNotification('Modul aktualisiert');
             }
