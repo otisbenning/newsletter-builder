@@ -369,6 +369,11 @@
             resize: vertical;
         }
 
+        /* Preserve line breaks in newsletter output */
+        .preserve-linebreaks {
+            white-space: pre-wrap;
+        }
+
         /* Tabs */
         .module-editor-tabs {
             display: flex;
@@ -1702,6 +1707,11 @@
                     this.autoSave();
                 }
             }
+            
+            convertLineBreaks(text) {
+                if (!text) return '';
+                return text.replace(/\n/g, '<br>');
+            }
 
             renderModuleContent(moduleData) {
                 const template = MODULE_TEMPLATES[moduleData.type];
@@ -1720,9 +1730,9 @@
                                         <h2 style="color: #009a93; margin: 0 0 20px 0; font-size: 24px; font-weight: bold;">
                                             ${moduleData.fields.eventsTitle || 'Unsere nächsten Events'}
                                         </h2>
-                                        ${validEvents.length > 0 ? 
+                                        ${validEvents.length > 0 && moduleData.fields.eventsIntroText ? 
                                             `<p style="color: #666; margin: 0 0 30px 0; font-size: 16px;">
-                                                Entdecke ${validEvents.length} spannende Event${validEvents.length !== 1 ? 's' : ''} in deiner Nähe:
+                                                ${moduleData.fields.eventsIntroText}
                                             </p>` : ''
                                         }
                                     </td>
@@ -1755,10 +1765,16 @@
                     }
                     
                     html = html.replace('{{eventsContent}}', eventsHtml);
-} else {
+                } else {
                     // Replace placeholders with field values
                     template.fields.forEach(field => {
-                        const value = moduleData.fields[field.name] || field.default;
+                        let value = moduleData.fields[field.name] || field.default;
+                        
+                        // Convert line breaks for textarea fields
+                        if (field.type === 'textarea') {
+                            value = this.convertLineBreaks(value);
+                        }
+                        
                         const regex = new RegExp(`{{${field.name}}}`, 'g');
                         html = html.replace(regex, value);
                     });
@@ -1930,6 +1946,11 @@
                 html += `<input type="text" id="eventsTitle" name="eventsTitle" value="${module.fields.eventsTitle || 'Unsere nächsten Events'}">`;
                 html += '</div>';
                 
+                html += '<div class="field-group">';
+                html += '<label for="eventsIntroText">Einleitungstext (optional)</label>';
+                html += `<input type="text" id="eventsIntroText" name="eventsIntroText" value="${module.fields.eventsIntroText || ''}" placeholder="z.B. Entdecke spannende Events in deiner Nähe">`;
+                html += '</div>';
+
                 html += '<div class="field-group">';
                 html += '<label>Events</label>';
                 html += '<button class="primary-btn" onclick="templateBuilder.showEventImport()">📥 Events importieren</button>';
@@ -2322,6 +2343,14 @@
                     }
                 });
                 
+                // Special handling for events module fields
+                if (this.currentEditingModule.type === 'events') {
+                    const eventsIntroInput = document.getElementById('eventsIntroText');
+                    if (eventsIntroInput) {
+                        this.currentEditingModule.fields.eventsIntroText = eventsIntroInput.value;
+                    }
+                }
+
                 // Update module display
                 const moduleElement = document.getElementById(this.currentEditingModule.id);
                 if (moduleElement) {
@@ -2735,8 +2764,12 @@
             </ol>
 
             <h3 style="color: #009a93; margin-top: 20px;">📥 Events vom Portal importieren</h3>
+            <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; margin-bottom: 15px; border-radius: 4px;">
+                <strong>⚠️ Browser-Hinweis:</strong> Das Bookmarklet funktioniert am besten in <strong>Microsoft Edge</strong>. 
+                In Chrome kann nach Strg+D die URL nicht bearbeitet werden. Nutzen Sie Edge oder ziehen Sie das Bookmarklet direkt per Drag & Drop in die Lesezeichenleiste.
+            </div>
             <ol style="line-height: 1.8;">
-                <li>Ziehen Sie das Bookmarklet in Ihre Lesezeichen-Leiste</li>
+                <li>Ziehen Sie das Bookmarklet in Ihre Lesezeichen-Leiste (funktioniert in allen Browsern)</li>
                 <li>Öffnen Sie <a href="https://portal.startwithafriend.de/events" target="_blank">portal.startwithafriend.de/events</a></li>
                 <li>Klicken Sie auf das Bookmarklet → Events werden in Zwischenablage kopiert</li>
                 <li>Fügen Sie die Events im Editor ein (Strg+V)</li>
