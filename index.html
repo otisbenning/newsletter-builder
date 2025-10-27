@@ -2071,7 +2071,10 @@
 
                 html += '<div class="field-group">';
                 html += '<label>Events</label>';
+                html += '<div style="display: flex; gap: 10px; margin-bottom: 15px;">';
                 html += '<button class="primary-btn" onclick="templateBuilder.showEventImport()">📥 Events importieren</button>';
+                html += '<button class="secondary-btn" onclick="templateBuilder.sortEventsManually()" title="Events nach Datum sortieren">📅 Nach Datum sortieren</button>';
+                html += '</div>';
                 html += '<div class="dynamic-items-list" style="margin-top: 15px;">';
                 
                 const events = this.sortEventsByDate(module.fields.events || []);
@@ -2215,19 +2218,22 @@
                         if (this.currentEditingModule.fields.events.length > 0) {
                             if (confirm(`Es sind bereits ${this.currentEditingModule.fields.events.length} Events vorhanden. Möchten Sie die neuen Events hinzufügen (OK) oder ersetzen (Abbrechen)?`)) {
                                 this.currentEditingModule.fields.events.push(...uniqueEvents);
-                                this.currentEditingModule.fields.events = this.sortEventsByDate(this.currentEditingModule.fields.events);
                             } else {
-                                this.currentEditingModule.fields.events = this.sortEventsByDate(uniqueEvents);
+                                this.currentEditingModule.fields.events = [...uniqueEvents];
                             }
                         } else {
-                            this.currentEditingModule.fields.events = this.sortEventsByDate(uniqueEvents);
+                            this.currentEditingModule.fields.events = [...uniqueEvents];
                         }
+                        
+                        // WICHTIG: Immer nach Import sortieren
+                        this.currentEditingModule.fields.events = this.sortEventsByDate(this.currentEditingModule.fields.events);
                         
                         // Clear textarea
                         textarea.value = '';
                         
-                        // Refresh editor
+                        // Refresh editor UND Vorschau
                         this.editModule(this.currentEditingModule.id);
+                        this.renderPreview();
                         
                         this.showNotification(`${uniqueEvents.length} Events erfolgreich importiert! (${events.length - uniqueEvents.length} Duplikate/ungültige Events entfernt)`, false, 'success');
                     }
@@ -2432,6 +2438,8 @@
             }
 
             sortEventsByDate(events) {
+                console.log('🔍 Sortiere Events:', events.map(e => ({ title: e.title, date: e.date })));
+                
                 return events.sort((a, b) => {
                     // Events ohne Datum ans Ende
                     if (!a.date && !b.date) return 0;
@@ -2439,10 +2447,26 @@
                     if (!b.date) return -1;
                     
                     // Nach Datum sortieren
-                    return new Date(a.date) - new Date(b.date);
+                    const result = new Date(a.date) - new Date(b.date);
+                    return result;
                 });
             }
             
+            sortEventsManually() {
+                if (this.currentEditingModule && this.currentEditingModule.fields.events) {
+                    // Events sortieren
+                    this.currentEditingModule.fields.events = this.sortEventsByDate(this.currentEditingModule.fields.events);
+                    
+                    // Editor neu laden um sortierte Events anzuzeigen
+                    this.editModule(this.currentEditingModule.id);
+                    
+                    // Vorschau aktualisieren
+                    this.renderPreview();
+                    
+                    this.showNotification('Events nach Datum sortiert', false, 'success');
+                }
+            }
+
             updateEvent(index, field, value) {
                 if (this.currentEditingModule && this.currentEditingModule.fields.events) {
                     this.currentEditingModule.fields.events[index][field] = value;
@@ -2516,6 +2540,11 @@
                     }
                 }
 
+                // Events nochmal sortieren vor dem Rendern
+                if (this.currentEditingModule.type === 'events' && this.currentEditingModule.fields.events) {
+                    this.currentEditingModule.fields.events = this.sortEventsByDate(this.currentEditingModule.fields.events);
+                }
+                
                 // Update module display
                 const moduleElement = document.getElementById(this.currentEditingModule.id);
                 if (moduleElement) {
@@ -2524,6 +2553,7 @@
                 }
                 
                 this.closeModuleEditor();
+                this.renderPreview(); // Vorschau auch aktualisieren
                 this.autoSave();
                 this.showNotification('Modul aktualisiert');
             }
