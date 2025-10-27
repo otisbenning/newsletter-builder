@@ -401,6 +401,7 @@
         .dynamic-items-list {
             max-height: 400px;
             overflow-y: auto;
+            overflow-anchor: none; /* Deaktiviere Scroll Anchoring */
         }
 
         .event-card {
@@ -410,6 +411,10 @@
             padding: 15px;
             margin-bottom: 10px;
             position: relative;
+        }
+
+        .event-card * {
+            overflow-anchor: none; /* Verhindere Scroll Anchoring in Event Cards */
         }
 
         .event-card-header {
@@ -517,6 +522,25 @@
 
         .rich-text-editor:focus {
             border-color: var(--primary-color);
+        }
+
+        .rich-text-editor ul,
+        .rich-text-editor ol {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+        
+        .rich-text-editor li {
+            margin: 5px 0;
+            padding-left: 5px;
+        }
+        
+        .rich-text-editor ul {
+            list-style-type: disc;
+        }
+        
+        .rich-text-editor ol {
+            list-style-type: decimal;
         }
 
         .rich-text-toolbar {
@@ -2062,6 +2086,14 @@
                 return html;
             }
 
+            // Events nach Sortierung neu rendern
+            renderSortedEvents() {
+                if (this.currentEditingModule && this.currentEditingModule.fields.events) {
+                    this.currentEditingModule.fields.events = this.sortEventsByDate(this.currentEditingModule.fields.events);
+                    this.editModule(this.currentEditingModule.id);
+                }
+            }
+
             buildEditorEventCard(event, index) {
             const personalizedTitle = this.cleanEventTitle(event.title);
             const personalizedDescription = event.description ? event.description : '';
@@ -2434,6 +2466,9 @@
                             if (monthElement) monthElement.textContent = months[date.getMonth()];
                             if (dayElement) dayElement.textContent = date.getDate().toString();
                         }
+                        
+                        // Events neu sortieren und anzeigen
+                        setTimeout(() => this.renderSortedEvents(), 500);
                     }
                 }
             }
@@ -2888,9 +2923,44 @@
         }
 
         function insertLink() {
-            const url = prompt('Link-URL eingeben:', 'https://');
-            if (url) {
-                document.execCommand('createLink', false, url);
+            // Prüfe ob bereits ein Link ausgewählt ist
+            const selection = window.getSelection();
+            let linkElement = null;
+            
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                let node = range.commonAncestorContainer;
+                
+                // Finde übergeordnetes <a> Element
+                while (node && node.nodeName !== 'A' && node !== document.body) {
+                    node = node.parentNode;
+                }
+                
+                if (node && node.nodeName === 'A') {
+                    linkElement = node;
+                }
+            }
+            
+            if (linkElement) {
+                // Bearbeite existierenden Link
+                const currentUrl = linkElement.href;
+                const newUrl = prompt('Link bearbeiten:', currentUrl);
+                
+                if (newUrl === null) {
+                    return; // Abbrechen
+                } else if (newUrl === '') {
+                    // Link entfernen
+                    document.execCommand('unlink', false, null);
+                } else {
+                    // Link aktualisieren
+                    linkElement.href = newUrl;
+                }
+            } else {
+                // Neuen Link erstellen
+                const url = prompt('Link-URL eingeben:', 'https://');
+                if (url && url !== 'https://') {
+                    document.execCommand('createLink', false, url);
+                }
             }
         }
 
@@ -2919,10 +2989,18 @@
 
         // Farb-Menü Toggle
         document.addEventListener('click', function(e) {
-            if (e.target.textContent === '🎨') {
-                const menu = e.target.nextElementSibling;
+            // Prüfe ob Button oder Parent-Element geklickt wurde
+            const colorBtn = e.target.closest('.rich-text-btn[title="Textfarbe"]');
+            if (colorBtn || e.target.textContent === '🎨') {
+                e.preventDefault();
+                e.stopPropagation();
+                const menu = (colorBtn || e.target).closest('.color-picker-wrapper').querySelector('.color-menu');
                 if (menu) {
-                    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+                    // Alle anderen Menüs schließen
+                    document.querySelectorAll('.color-menu').forEach(m => {
+                        if (m !== menu) m.style.display = 'none';
+                    });
+                    menu.style.display = menu.style.display === 'none' || menu.style.display === '' ? 'block' : 'none';
                 }
             } else {
                 // Alle Farb-Menüs schließen, wenn außerhalb geklickt wird
