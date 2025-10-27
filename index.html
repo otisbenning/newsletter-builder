@@ -1833,7 +1833,11 @@
                 
                 // Special handling for events module
                 if (moduleData.type === 'events') {
-                    const events = this.sortEventsByDate(moduleData.fields.events || []);
+                    // WICHTIG: Events im Modul selbst sortieren und speichern
+                    if (moduleData.fields.events && moduleData.fields.events.length > 0) {
+                        moduleData.fields.events = this.sortEventsByDate(moduleData.fields.events);
+                    }
+                    const events = moduleData.fields.events || [];
                     const validEvents = events.filter(event => event.title && event.title.trim() !== '' && event.title !== 'Event');
                     
                     let eventsHtml = `
@@ -2480,6 +2484,15 @@
             }
 
             saveModuleEdit() {
+                if (!this.currentEditingModule) return;
+                
+                // Events vor dem Speichern sortieren
+                if (this.currentEditingModule.type === 'events' && this.currentEditingModule.fields.events) {
+                    this.currentEditingModule.fields.events = this.sortEventsByDate(this.currentEditingModule.fields.events);
+                }
+                
+                const template = MODULE_TEMPLATES[this.currentEditingModule.type];
+                
                 if (!this.currentEditingModule) return;
                 
                 const template = MODULE_TEMPLATES[this.currentEditingModule.type];
