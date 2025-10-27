@@ -2493,10 +2493,6 @@
                 
                 const template = MODULE_TEMPLATES[this.currentEditingModule.type];
                 
-                if (!this.currentEditingModule) return;
-                
-                const template = MODULE_TEMPLATES[this.currentEditingModule.type];
-                
                 // Save regular fields
                 template.fields.forEach(field => {
                     if (field.type !== 'dynamic-list') {
